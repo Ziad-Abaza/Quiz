@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,16 @@
 </head>
 <body>
   <div class="app-wrapper">
+    <!-- Utility Bar: Language Switcher & Admin Link -->
+    <div class="utility-bar">
+      <button type="button" id="langSwitchBtn" class="lang-switcher-btn">
+        English
+      </button>
+      <a href="admin.html" class="admin-link-inline" data-i18n="common.teacherPortal">
+        🛡️ Teacher Portal
+      </a>
+    </div>
+
     <!-- Student Info Header (Displays active student info) -->
     <header class="app-header student-header animate-pop" id="globalStudentHeader" style="display: none;">
       <div class="student-profile-badge">
@@ -20,7 +30,7 @@
         </div>
       </div>
       <div class="header-right-meta">
-        <span class="badge badge-primary" id="headerQuizStatus">🚀 Quiz Adventure Active</span>
+        <span class="badge badge-primary" id="headerQuizStatus" data-i18n="runner.activeStatus">🚀 Quiz Adventure Active</span>
       </div>
     </header>
 
@@ -31,24 +41,24 @@
         <div class="welcome-avatar-wrapper">
           <div class="welcome-avatar animate-pulse-glow">🧑‍🚀⭐</div>
         </div>
-        <h1>Welcome, Explorer!</h1>
-        <p>Ready to test your knowledge? Enter your name to blast off into today's challenge!</p>
+        <h1 data-i18n="registration.welcomeTitle">Welcome, Explorer! 🧑‍🚀</h1>
+        <p data-i18n="registration.welcomeSubtitle">Ready to test your tech knowledge? Enter your name to blast off into today's challenge!</p>
 
         <form id="registrationForm">
           <div class="form-group">
-            <label for="studentName" class="form-label">🧑‍🎓 Student Full Name</label>
-            <input type="text" id="studentName" class="form-input" placeholder="e.g. Alex Smith" required autocomplete="off">
+            <label for="studentName" class="form-label" data-i18n="registration.nameLabel">🧑‍🎓 Student Full Name</label>
+            <input type="text" id="studentName" class="form-input" data-i18n-placeholder="registration.namePlaceholder" placeholder="e.g. Alex Smith" required autocomplete="off">
           </div>
 
           <div class="form-group">
-            <label for="studentGrade" class="form-label">🏫 Grade / Class</label>
+            <label for="studentGrade" class="form-label" data-i18n="registration.gradeLabel">🏫 Grade / Class</label>
             <select id="studentGrade" class="form-select" required>
               <option value="Senior 7" selected>Senior 7</option>
             </select>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-            <span>Start Quiz Adventure</span> 🚀
+            <span data-i18n="registration.startBtn">Start Quiz Adventure 🚀</span>
           </button>
         </form>
       </div>
@@ -60,7 +70,7 @@
         <div class="quiz-shell-topbar">
           <div class="student-info-badge">
             <span>👤</span>
-            <span id="runnerStudentInfo">Alex (Grade 3)</span>
+            <span id="runnerStudentInfo">Alex (Senior 7)</span>
           </div>
 
           <div class="quiz-counter" id="runnerQuizCounter">
@@ -84,11 +94,11 @@
     <section id="completionScreen" class="screen animate-pop">
       <div class="card completion-card">
         <div class="trophy-icon animate-bounce">🏆</div>
-        <h1>Fantastic Job!</h1>
-        <p id="completionStudentName">You completed all quizzes successfully!</p>
+        <h1 data-i18n="completion.congratsTitle">Fantastic Job! 🏆</h1>
+        <p id="completionStudentName" data-i18n="completion.congratsSubtitle">You completed all quizzes successfully!</p>
 
         <div class="score-summary-box">
-          <div class="score-big" id="finalScoreDisplay">10 / 10</div>
+          <div class="score-big" id="finalScoreDisplay">9 / 9</div>
           <div style="font-weight: 800; color: var(--accent-green-dark);" id="finalPercentageDisplay">100% Score</div>
 
           <div class="breakdown-list" id="finalBreakdownList">
@@ -97,10 +107,10 @@
         </div>
 
         <div class="completion-actions">
-          <button id="nextStudentBtn" class="btn btn-primary">
+          <button id="nextStudentBtn" class="btn btn-primary" data-i18n="common.nextStudent">
             New Student / Start Over 🔄
           </button>
-          <a href="admin.html" class="btn btn-outline">
+          <a href="admin.html" class="btn btn-outline" data-i18n="common.viewAdminResults">
             View All Results in Admin 📊
           </a>
         </div>
@@ -110,6 +120,7 @@
 
   <!-- Core Platform Scripts -->
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="quizzes/manifest.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/export.js"></script>

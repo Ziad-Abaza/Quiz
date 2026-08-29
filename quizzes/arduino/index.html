@@ -11,10 +11,10 @@
     <!-- Header Section -->
     <header class="mission-header">
       <div class="mission-badge animate-pulse-glow">
-        <span>مهمة اليوم</span>
+        <span id="quizBadgeTitle">مهمة اليوم</span>
         <span>🔍</span>
       </div>
-      <p class="mission-instruction">
+      <p class="mission-instruction" id="quizInstructionText">
         انظر إلى لوحة Arduino جيدًا، ثم اكتب اسم الجزء الذي يشير إليه كل سهم. حاول بنفسك وتعلّم! ✨
       </p>
     </header>
@@ -30,10 +30,10 @@
     <!-- Action Buttons & Live Feedback -->
     <div class="quiz-actions">
       <button id="checkBtn" class="btn-action btn-check">
-        <span>تحقق من إجاباتي</span> 🚀
+        <span id="checkBtnText">تحقق من إجاباتي</span> 🚀
       </button>
       <button id="resetBtn" class="btn-action btn-reset">
-        <span>إعادة المحاولة</span> 🔄
+        <span id="resetBtnText">إعادة المحاولة</span> 🔄
       </button>
     </div>
 
@@ -41,6 +41,7 @@
   </div>
 
   <!-- Quiz Platform SDK Integration -->
+  <script src="../../js/i18n.js"></script>
   <script src="../../js/quiz-sdk.js"></script>
   <script src="arduino-quiz.js"></script>
 </body>

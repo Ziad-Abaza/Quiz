@@ -57,12 +57,44 @@
       showScreen(registrationScreen);
     }
 
+    // Language switcher toggle
+    const langBtn = document.getElementById("langSwitchBtn");
+    if (langBtn) {
+      langBtn.addEventListener("click", () => {
+        window.I18n.toggleLang();
+      });
+    }
+
+    if (window.I18n) {
+      window.I18n.onLanguageChange(() => {
+        updateDynamicTexts();
+      });
+    }
+
     // Form Submission
     registrationForm.addEventListener("submit", handleRegistration);
     nextStudentBtn.addEventListener("click", handleStartOver);
 
     // Listen for QuizSDK postMessage events
     window.addEventListener("message", handleQuizMessage);
+  }
+
+  function updateDynamicTexts() {
+    const session = storage.getCurrentSession();
+    if (session) {
+      if (headerStudentName) headerStudentName.textContent = session.name;
+      if (headerStudentGrade) headerStudentGrade.textContent = session.grade;
+      if (runnerStudentInfo) runnerStudentInfo.textContent = session.name + " (" + session.grade + ")";
+    }
+    if (quizRunnerScreen.classList.contains("active")) {
+      const quiz = manifest[currentQuizIndex];
+      if (quiz && runnerQuizCounter) {
+        const counterText = window.I18n ? 
+          window.I18n.t("runner.quizCounter", { current: currentQuizIndex + 1, total: manifest.length }) :
+          "Quiz " + (currentQuizIndex + 1) + " of " + manifest.length;
+        runnerQuizCounter.textContent = counterText + ": " + quiz.title;
+      }
+    }
   }
 
   function handleRegistration(e) {
@@ -103,7 +135,10 @@
     storage.updateQuizIndex(index);
 
     const quiz = manifest[index];
-    runnerQuizCounter.textContent = "Quiz " + (index + 1) + " of " + manifest.length + ": " + quiz.title;
+    const counterText = window.I18n ? 
+      window.I18n.t("runner.quizCounter", { current: index + 1, total: manifest.length }) :
+      "Quiz " + (index + 1) + " of " + manifest.length;
+    runnerQuizCounter.textContent = counterText + ": " + quiz.title;
 
     // Update Progress Bar
     const progressPct = Math.round((index / manifest.length) * 100);
@@ -142,10 +177,13 @@
     if (!completedSession) return;
 
     // Update Completion Screen UI
+    const congratsMsg = window.I18n ? 
+      window.I18n.t("completion.congratsSubtitle") : 
+      "You finished all quizzes!";
     document.getElementById("completionStudentName").textContent = 
-      "Super job, " + completedSession.name + "! You finished all quizzes!";
+      completedSession.name + " - " + congratsMsg;
     finalScoreDisplay.textContent = completedSession.totalScore + " / " + completedSession.totalMaxScore;
-    finalPercentageDisplay.textContent = completedSession.percentage + "% Overall Score";
+    finalPercentageDisplay.textContent = completedSession.percentage + "%";
 
     // Render Quiz Breakdown
     finalBreakdownList.innerHTML = "";
@@ -158,7 +196,7 @@
           "<span>" + scoreObj.score + " / " + scoreObj.maxScore + " pts</span>";
       } else {
         item.innerHTML = "<span><strong>" + escapeHtml(quiz.title) + "</strong></span>" +
-          "<span>0 / " + (quiz.maxScore || 10) + " pts</span>";
+          "<span>-</span>";
       }
       finalBreakdownList.appendChild(item);
     });

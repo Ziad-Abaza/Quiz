@@ -257,16 +257,64 @@
   const resetBtn = document.getElementById("resetBtn");
   const feedbackMsg = document.getElementById("feedbackMsg");
 
+  const i18nTexts = {
+    ar: {
+      title: "مهمة اليوم",
+      instruction: "انظر إلى لوحة Arduino جيدًا، ثم اكتب اسم الجزء الذي يشير إليه كل سهم. حاول بنفسك وتعلّم! ✨",
+      placeholder: "اكتب اسم المكون رقم {id}...",
+      checkBtn: "تحقق من إجاباتي",
+      resetBtn: "إعادة المحاولة",
+      perfectScore: "🎉 مبروك يا بطل! أجبت على جميع المكونات بنجاح ({score} / {total})",
+      partialScore: "أحسنت المحاولة! نتيجتك: {score} من {total}. راجع المكونات وحاول مجددًا!"
+    },
+    en: {
+      title: "Today's Mission",
+      instruction: "Examine the Arduino Uno board carefully, then write the name of the component indicated by each arrow. Give it your best! ✨",
+      placeholder: "Enter component #{id} name...",
+      checkBtn: "Check My Answers",
+      resetBtn: "Try Again",
+      perfectScore: "🎉 Fantastic job! You identified all components correctly! ({score} / {total})",
+      partialScore: "Good try! Your score: {score} of {total}. Review the parts and try again!"
+    }
+  };
+
+  function getLang() {
+    return (window.I18n && window.I18n.getLang()) || "ar";
+  }
+
   function createCardHTML(comp) {
+    const lang = getLang();
+    const ph = i18nTexts[lang].placeholder.replace("{id}", comp.id);
     return `
       <div class="component-card" id="card-${comp.id}" style="border-color: ${comp.color}; background-color: ${comp.color}0D;">
         <div class="card-badge" style="background-color: ${comp.color};">${comp.id}</div>
         <div class="card-input-wrapper">
-          <input type="text" class="card-input" id="input-${comp.id}" placeholder="اكتب اسم المكون رقم ${comp.id}..." autocomplete="off">
+          <input type="text" class="card-input" id="input-${comp.id}" placeholder="${ph}" autocomplete="off">
         </div>
         <span class="status-icon" id="status-${comp.id}"></span>
       </div>
     `;
+  }
+
+  function applyLanguage() {
+    const lang = getLang();
+    const texts = i18nTexts[lang];
+    const badgeTitle = document.getElementById("quizBadgeTitle");
+    const instr = document.getElementById("quizInstructionText");
+    const checkTxt = document.getElementById("checkBtnText");
+    const resetTxt = document.getElementById("resetBtnText");
+
+    if (badgeTitle) badgeTitle.textContent = texts.title;
+    if (instr) instr.textContent = texts.instruction;
+    if (checkTxt) checkTxt.textContent = texts.checkBtn;
+    if (resetTxt) resetTxt.textContent = texts.resetBtn;
+
+    components.forEach(comp => {
+      const input = document.getElementById(`input-${comp.id}`);
+      if (input) {
+        input.setAttribute("placeholder", texts.placeholder.replace("{id}", comp.id));
+      }
+    });
   }
 
   function init() {
@@ -276,6 +324,14 @@
         .sort((a, b) => a.id - b.id)
         .map(comp => createCardHTML(comp))
         .join("");
+    }
+
+    applyLanguage();
+
+    if (window.I18n) {
+      window.I18n.onLanguageChange(() => {
+        applyLanguage();
+      });
     }
 
     // Attach input listeners
@@ -323,10 +379,14 @@
       }
     });
 
+    const lang = getLang();
+    const texts = i18nTexts[lang];
     if (score === total) {
-      feedbackMsg.innerHTML = `<span style="color: #16A34A; font-weight: 900; font-size: 1.2rem;">🎉 مبروك يا بطل! أجبت على جميع المكونات بنجاح (${score} / ${total})</span>`;
+      const msg = texts.perfectScore.replace("{score}", score).replace("{total}", total);
+      feedbackMsg.innerHTML = `<span style="color: #16A34A; font-weight: 900; font-size: 1.2rem;">${msg}</span>`;
     } else {
-      feedbackMsg.innerHTML = `<span style="color: #EA580C; font-weight: 800; font-size: 1.1rem;">أحسنت المحاولة! نتيجتك: ${score} من ${total}.</span>`;
+      const msg = texts.partialScore.replace("{score}", score).replace("{total}", total);
+      feedbackMsg.innerHTML = `<span style="color: #EA580C; font-weight: 800; font-size: 1.1rem;">${msg}</span>`;
     }
 
     if (window.QuizSDK) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,19 +12,22 @@
   <!-- PASSWORD AUTHENTICATION MODAL -->
   <div id="authModal" class="modal-overlay">
     <div class="card modal-card animate-pop">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+        <button type="button" class="lang-switcher-btn" style="font-size: 0.8rem; padding: 4px 12px;">English</button>
+      </div>
       <div class="modal-icon animate-pulse-glow">🛡️✨</div>
-      <h2>Teacher & Admin Portal</h2>
-      <p>Enter the security key to access student scores & analytics.</p>
+      <h2 data-i18n="admin.loginTitle">Teacher & Admin Portal</h2>
+      <p data-i18n="admin.loginSubtitle">Enter the security key to access student scores & analytics.</p>
 
       <form id="authForm" style="margin-top: 18px;" onsubmit="return false;">
         <div class="form-group">
-          <input type="password" id="adminPasswordInput" class="form-input" required autofocus>
+          <input type="password" id="adminPasswordInput" class="form-input" data-i18n-placeholder="admin.loginPlaceholder" placeholder="🔑 Enter admin password..." required autofocus>
           <div id="authError" class="error-msg"></div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">
-          <span>Access Control Center</span> 🚀
+          <span data-i18n="admin.loginBtn">Access Control Center 🚀</span>
         </button>
-        <a href="index.html" class="btn btn-outline" style="width: 100%; margin-top: 10px;">
+        <a href="index.html" class="btn btn-outline" style="width: 100%; margin-top: 10px;" data-i18n="common.backToQuizzes">
           ← Back to Quizzes
         </a>
       </form>
@@ -50,13 +53,14 @@
           </svg>
         </div>
         <div class="brand-text-group">
-          <span class="brand-title">Teacher & Admin Portal</span>
-          <span class="brand-subtitle">Results Control • Senior 7</span>
+          <span class="brand-title" data-i18n="admin.headerTitle">Teacher & Admin Portal</span>
+          <span class="brand-subtitle" data-i18n="admin.headerSubtitle">Results Control • Senior 7</span>
         </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <a href="index.html" class="admin-link">🚀 Student View</a>
-        <button id="logoutBtn" class="admin-link" style="border: none; cursor: pointer;">Logout</button>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button type="button" class="lang-switcher-btn">English</button>
+        <a href="index.html" class="admin-link" data-i18n="common.studentPortal">🚀 Student View</a>
+        <button id="logoutBtn" class="admin-link" style="border: none; cursor: pointer;" data-i18n="common.logout">Logout</button>
       </div>
     </header>
 
@@ -66,7 +70,7 @@
         <div class="stat-icon">🎓</div>
         <div>
           <div class="stat-value" id="statTotalStudents">0</div>
-          <div class="stat-label">Students Completed</div>
+          <div class="stat-label" data-i18n="admin.statTotalStudents">Total Students</div>
         </div>
       </div>
 
@@ -74,7 +78,7 @@
         <div class="stat-icon">⭐</div>
         <div>
           <div class="stat-value" id="statAverageScore">0%</div>
-          <div class="stat-label">Average Class Score</div>
+          <div class="stat-label" data-i18n="admin.statAvgScore">Average Class Score</div>
         </div>
       </div>
 
@@ -82,7 +86,7 @@
         <div class="stat-icon">📚</div>
         <div>
           <div class="stat-value" id="statTotalQuizzes">0</div>
-          <div class="stat-label">Registered Quizzes</div>
+          <div class="stat-label" data-i18n="admin.statTotalQuizzes">Registered Quizzes</div>
         </div>
       </div>
     </div>
@@ -90,16 +94,13 @@
     <!-- Toolbar: Search & Action Buttons -->
     <div class="card" style="margin-bottom: 24px; padding: 24px;">
       <div class="toolbar">
-        <input type="text" id="searchInput" class="form-input search-input" placeholder="🔍 Search by student name or grade...">
+        <input type="text" id="searchInput" class="form-input search-input" data-i18n-placeholder="admin.searchPlaceholder" placeholder="🔍 Search by student name or grade...">
         
         <div class="toolbar-actions">
-          <button id="downloadTxtBtn" class="btn btn-success">
+          <button id="downloadTxtBtn" class="btn btn-success" data-i18n="admin.exportBtn">
             📥 Download Unified TXT Report
           </button>
-          <button id="changePwdBtn" class="btn btn-outline">
-            🔑 Change Password
-          </button>
-          <button id="clearDataBtn" class="btn btn-outline" style="color: var(--accent-coral); border-color: var(--accent-coral);">
+          <button id="clearDataBtn" class="btn btn-outline" style="color: var(--accent-coral); border-color: var(--accent-coral);" data-i18n="admin.clearBtn">
             🗑️ Clear All Records
           </button>
         </div>
@@ -111,11 +112,11 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Student Name</th>
-              <th>Grade / Class</th>
-              <th>Score</th>
-              <th>Performance</th>
-              <th>Completed Time</th>
+              <th data-i18n="admin.tableColStudent">Student Name</th>
+              <th data-i18n="admin.tableColGrade">Grade / Class</th>
+              <th data-i18n="admin.tableColScore">Score</th>
+              <th data-i18n="admin.tableColPercentage">Performance</th>
+              <th data-i18n="admin.tableColDate">Completed Time</th>
             </tr>
           </thead>
           <tbody id="resultsTableBody">
@@ -128,6 +129,7 @@
 
   <!-- Core Scripts -->
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="quizzes/manifest.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/export.js"></script>

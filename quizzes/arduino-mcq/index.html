@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang=ar dir=rtl>
+<head>
+  <meta charset=UTF-8>
+  <meta name=viewport content=width=device-width, initial-scale=1.0>
+  <title>اختبار أساسيات الأردوينو | Arduino Basics Quiz</title>
+  <link rel=stylesheet href=mcq-quiz.css>
+</head>
+<body>
+  <div class=mcq-container animate-pop>
+    <!-- Quiz Header & Dynamic Counter -->
+    <header class=mcq-header>
+      <div class=mcq-title-badge>
+        <span>💡</span>
+        <span id=quizTitleText>اختبار أساسيات الأردوينو</span>
+      </div>
+      <div class=mcq-counter-badge id=counterBadge>
+        1 / 15
+      </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class=mcq-progress-track>
+      <div class=mcq-progress-fill id=progressFill style=width: 6.66%;></div>
+    </div>
+
+    <!-- Active Question Container -->
+    <div class=question-box>
+      <h2 class=question-text id=questionText></h2>
+    </div>
+
+    <!-- 4 Options Grid -->
+    <div class=options-grid id=optionsGrid></div>
+
+    <!-- Nav Footer -->
+    <footer class=mcq-nav-actions>
+      <button type=button id=prevBtn class=btn-nav btn-prev disabled>
+        ← السابق
+      </button>
+
+      <div style=display: flex; gap: 12px;>
+        <button type=button id=nextBtn class=btn-nav btn-next>
+          التالي →
+        </button>
+        <button type=button id=submitBtn class=btn-nav btn-submit style=display: none;>
+          إنهاء وتسليم الاختبار 🚀
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Platform SDK & i18n Integration -->
+  <script src=../../js/i18n.js></script>
+  <script src=../../js/quiz-sdk.js></script>
+  <script src=mcq-quiz.js></script>
+</body>
+</html>

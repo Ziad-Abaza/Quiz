@@ -37,10 +37,22 @@
 
     authForm.addEventListener("submit", handleLogin);
     logoutBtn.addEventListener("click", handleLogout);
+    // Language Switcher Buttons
+    document.querySelectorAll(".lang-switcher-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (window.I18n) window.I18n.toggleLang();
+      });
+    });
+
+    if (window.I18n) {
+      window.I18n.onLanguageChange(() => {
+        renderDashboard(searchInput.value);
+      });
+    }
+
     searchInput.addEventListener("input", handleSearch);
     downloadTxtBtn.addEventListener("click", handleDownloadTxt);
-    changePwdBtn.addEventListener("click", handleChangePassword);
-    clearDataBtn.addEventListener("click", handleClearData);
+    if (clearDataBtn) clearDataBtn.addEventListener("click", handleClearData);
   }
 
   function handleLogin(e) {
@@ -53,7 +65,7 @@
       authError.textContent = "";
       unlockDashboard();
     } else {
-      authError.textContent = "❌ Incorrect password. Please try again.";
+      authError.textContent = window.I18n ? window.I18n.t("admin.loginError") : "❌ Incorrect password. Please try again.";
       adminPasswordInput.value = "";
       adminPasswordInput.focus();
     }
@@ -101,7 +113,9 @@
     resultsTableBody.innerHTML = "";
 
     if (results.length === 0) {
-      resultsTableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📋</div><p>No student quiz records found.</p></td></tr>';
+      const emptyTitle = window.I18n ? window.I18n.t("admin.emptyTitle") : "No student quiz records found.";
+      const emptySubtitle = window.I18n ? window.I18n.t("admin.emptySubtitle") : "";
+      resultsTableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📋</div><strong>' + emptyTitle + '</strong><p style="margin-top: 4px; font-size: 0.85rem;">' + emptySubtitle + '</p></td></tr>';
       return;
     }
 
@@ -127,7 +141,7 @@
   function handleDownloadTxt() {
     const results = storage.getAllResults();
     if (results.length === 0) {
-      alert("No student records available to export yet.");
+      alert(window.I18n ? window.I18n.t("admin.emptyTitle") : "No student records available to export yet.");
       return;
     }
 
@@ -136,27 +150,13 @@
     exporter.downloadTxtFile(filename, reportContent);
   }
 
-  function handleChangePassword() {
-    const newPwd = prompt("Enter the new Admin password:");
-    if (newPwd !== null) {
-      if (newPwd.trim().length >= 4) {
-        storage.setAdminPassword(newPwd.trim());
-        alert("✅ Admin password updated successfully!");
-      } else {
-        alert("Password must be at least 4 characters long.");
-      }
-    }
-  }
-
   function handleClearData() {
-    const confirm1 = confirm("⚠️ Are you sure you want to permanently delete all student quiz results?");
-    if (confirm1) {
-      const confirm2 = confirm("This action CANNOT be undone. Type OK to confirm clearing all data.");
-      if (confirm2) {
-        storage.clearAllResults();
-        renderDashboard();
-        alert("Database cleared successfully.");
-      }
+    const confirmMsg = window.I18n ? 
+      window.I18n.t("admin.clearConfirm") : 
+      "Are you sure you want to delete all student records? This action cannot be undone.";
+    if (confirm(confirmMsg)) {
+      storage.clearAllResults();
+      renderDashboard();
     }
   }
 
