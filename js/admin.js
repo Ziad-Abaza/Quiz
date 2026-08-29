@@ -115,9 +115,8 @@
     cachedResults = results;
     statTotalStudents.textContent = results.length;
 
-    // Normalize and dynamically calculate percentage for every record
+    // Normalize and dynamically calculate percentage for every record while strictly preserving answers
     results.forEach(function(student) {
-      // If totalMaxScore is not present or percentage is missing/0, compute dynamically from scores dictionary or totals
       var totalScore = 0;
       var totalMaxScore = 0;
 
