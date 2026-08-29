@@ -21,6 +21,7 @@
   const searchInput = document.getElementById("searchInput");
   const resultsTableBody = document.getElementById("resultsTableBody");
   const downloadTxtBtn = document.getElementById("downloadTxtBtn");
+  const resetAllDevicesAdminBtn = document.getElementById("resetAllDevicesAdminBtn");
   const unlockDeviceAdminBtn = document.getElementById("unlockDeviceAdminBtn");
   const changePwdBtn = document.getElementById("changePwdBtn");
   const clearDataBtn = document.getElementById("clearDataBtn");
@@ -53,8 +54,58 @@
 
     searchInput.addEventListener("input", handleSearch);
     downloadTxtBtn.addEventListener("click", handleDownloadTxt);
+    if (resetAllDevicesAdminBtn) resetAllDevicesAdminBtn.addEventListener("click", handleResetAllDevices);
     if (unlockDeviceAdminBtn) unlockDeviceAdminBtn.addEventListener("click", handleResetDevice);
     if (clearDataBtn) clearDataBtn.addEventListener("click", handleClearData);
+  }
+
+  async function handleResetAllDevices() {
+    if (!isAuthenticated) {
+      alert("Unauthorized action. Please log in as Admin.");
+      return;
+    }
+
+    const confirmMsg = window.I18n ?
+      window.I18n.t("admin.resetAllDevicesConfirm") :
+      "Are you sure you want to remotely reset and unlock all student devices? This will allow all students to start a new exam attempt without deleting previous results.";
+
+    if (!confirm(confirmMsg)) return;
+
+    if (resetAllDevicesAdminBtn) {
+      resetAllDevicesAdminBtn.disabled = true;
+      resetAllDevicesAdminBtn.textContent = window.I18n ? window.I18n.t("common.loading") : "Resetting...";
+    }
+
+    try {
+      if (window.QuizSheetsApi && window.QuizSheetsApi.isConfigured()) {
+        const res = await window.QuizSheetsApi.resetAllDevices();
+        if (!res || !res.success) {
+          throw new Error(res && res.error ? res.error : "Failed to issue reset command to server.");
+        }
+        if (res.resetVersion) {
+          storage.syncWithServerResetVersion(res.resetVersion);
+        }
+      } else {
+        storage.setDeviceLocked(false);
+        storage.clearCurrentSession();
+      }
+
+      const alertMsg = window.I18n ?
+        window.I18n.t("admin.resetAllDevicesAlert") :
+        "Global reset command issued successfully! All student devices will automatically unlock and allow new attempts. 🚀";
+      alert(alertMsg);
+
+    } catch (err) {
+      console.error("handleResetAllDevices error:", err);
+      alert("❌ " + err.message);
+    } finally {
+      if (resetAllDevicesAdminBtn) {
+        resetAllDevicesAdminBtn.disabled = false;
+        resetAllDevicesAdminBtn.textContent = window.I18n ?
+          window.I18n.t("admin.resetAllDevicesBtn") :
+          "🔄 Reset All Devices / Allow Retake";
+      }
+    }
   }
 
   function handleResetDevice() {
