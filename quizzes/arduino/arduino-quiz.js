@@ -449,7 +449,7 @@
       const card = document.getElementById(`card-${comp.id}`);
       const status = document.getElementById(`status-${comp.id}`);
       const rawVal = input ? input.value : "";
-      const val = normalizeArabic(rawVal);
+      const val = normalizeText(rawVal);
 
       if (card) card.classList.remove("correct", "wrong");
 
