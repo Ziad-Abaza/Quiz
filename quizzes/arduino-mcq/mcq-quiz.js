@@ -4,187 +4,187 @@
  * Correct Answers Matrix: [2, 2, 2, 3, 2, 1, 2, 3, 3, 3, 1, 3, 2, 1, 2] (1-indexed)
  */
 (function() {
-  const correctAnswers = [2, 2, 2, 3, 2, 1, 2, 3, 3, 3, 1, 3, 2, 1, 2];
+  const correctAnswers = [2, 2, 2, 3, 2, 1, 2, 3, 2, 3, 2, 3, 1, 2, 2];
 
   const questionsData = [
     {
       id: 1,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "1. ما هو المتحكم الدقيق (Microcontroller) الرئيسي في لوحة Arduino Uno؟",
-        options: ["ATmega2560", "ATmega328P", "ESP32", "STM32"]
+        q: "1. ما هو المكون المسؤول عن معالجة الأوامر وتنفيذ الكود البرمجي في دائرتك؟",
+        options: ["LED", "Arduino Uno", "Buzzer", "DHT11"]
       },
       en: {
-        q: "1. What is the main microcontroller chip on the Arduino Uno board?",
-        options: ["ATmega2560", "ATmega328P", "ESP32", "STM32"]
+        q: "1. Which component is responsible for processing commands and executing code in your circuit?",
+        options: ["LED", "Arduino Uno", "Buzzer", "DHT11"]
       }
     },
     {
       id: 2,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "2. كم عدد المنافذ الرقمية (Digital I/O Pins) في لوحة Arduino Uno؟",
-        options: ["10 منافذ", "14 منفذًا (D0 إلى D13)", "6 منافذ", "20 منفذًا"]
+        q: "2. يُعتبر الـ LED من عناصر الـ:",
+        options: ["Input (المدخلات)", "Output (المخرجات)", "Sensors (الحساسات)", "Power Supply (مصادر الطاقة)"]
       },
       en: {
-        q: "2. How many Digital I/O Pins are on the Arduino Uno board?",
-        options: ["10 Pins", "14 Pins (D0 to D13)", "6 Pins", "20 Pins"]
+        q: "2. The LED is classified as an:",
+        options: ["Input element", "Output element", "Sensor element", "Power Supply element"]
       }
     },
     {
       id: 3,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "3. ما هي وظيفة منفذ USB من النوع Type-B في الأردوينو؟",
-        options: ["شحن بطارية الهاتف فقط", "توصيل اللوحة بالكمبيوتر للبرمجة وتوفير الطاقة", "توصيل مكبر صوت خارجي", "توصيل شاشة HDMI"]
+        q: "3. الطرف الأطول في الـ LED يمثل القطب:",
+        options: ["السالب (Cathode)", "الموجب (Anode)", "الأرضي (GND)", "التناظري (Analog)"]
       },
       en: {
-        q: "3. What is the function of the USB Type-B port on Arduino?",
-        options: ["Charge mobile phone only", "Connect to computer for programming & power", "Connect an external speaker", "Connect an HDMI screen"]
+        q: "3. The longer leg of an LED represents the:",
+        options: ["Negative pole (Cathode)", "Positive pole (Anode)", "Ground pole (GND)", "Analog pole"]
       }
     },
     {
       id: 4,
-      correct: 3,
+      correct: 3, // C
       ar: {
-        q: "4. كم عدد المنافذ التناظرية (Analog Input Pins) في لوحة Arduino Uno؟",
-        options: ["2 منفذ", "4 منافذ", "6 منافذ (A0 إلى A5)", "14 منفذًا"]
+        q: "4. أي من المكونات التالية يُستخدم لإصدار تنبيهات صوتية أو نغمات؟",
+        options: ["IR Sensor", "Touch Sensor", "Buzzer", "MQ-2"]
       },
       en: {
-        q: "4. How many Analog Input Pins (A0-A5) are available on Arduino Uno?",
-        options: ["2 Pins", "4 Pins", "6 Pins (A0 to A5)", "14 Pins"]
+        q: "4. Which of the following components is used to emit sound alerts or musical tones?",
+        options: ["IR Sensor", "Touch Sensor", "Buzzer", "MQ-2"]
       }
     },
     {
       id: 5,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "5. ما هو الجهد الكهربائي التشغيلي القياسي للوحة Arduino Uno؟",
-        options: ["12V", "5V", "1.5V", "220V"]
+        q: "5. وظيفة حساس الـ MQ-2 هي الكشف عن:",
+        options: ["درجة الحرارة والرطوبة", "الدخان والغازات القابلة للاشتعال", "شدة الإضاءة", "حركة الأجسام"]
       },
       en: {
-        q: "5. What is the standard operating voltage for the Arduino Uno logic?",
-        options: ["12V", "5V", "1.5V", "220V"]
+        q: "5. The main function of the MQ-2 sensor is detecting:",
+        options: ["Temperature and humidity", "Smoke and flammable gases", "Light intensity", "Object motion"]
       }
     },
     {
       id: 6,
-      correct: 1,
+      correct: 1, // A
       ar: {
-        q: "6. ما هي وظيفة زر Reset الموجود على اللوحة؟",
-        options: ["إعادة تشغيل البرنامج من البداية", "مسح البرنامج نهائيًا من الذاكرة", "زيادة سرعة المعالج", "إيقاف الطاقة تمامًا"]
+        q: "6. إذا أردنا قياس كل من درجة الحرارة ونسبة الرطوبة معاً، نستخدم حساس:",
+        options: ["DHT11", "IR Sensor", "Touch Sensor", "MQ-2"]
       },
       en: {
-        q: "6. What is the purpose of the Reset button on the Arduino board?",
-        options: ["Restart the uploaded program from the beginning", "Erase the program permanently", "Boost CPU clock speed", "Turn off power permanently"]
+        q: "6. If we want to measure both temperature and humidity together, we use the:",
+        options: ["DHT11 sensor", "IR Sensor", "Touch Sensor", "MQ-2 sensor"]
       }
     },
     {
       id: 7,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "7. ما الذي يرمز إليه المنفذ GND في لوحة الأردوينو؟",
-        options: ["منفذ الإنترنت (Ground Network Data)", "الطرف الأرضي للدائرة (Ground - 0V)", "منفذ الطاقة العالية (Gain Normal Direct)", "منفذ المحرك"]
+        q: "7. ما هي الوظيفة الأساسية لحساس الـ IR Sensor في مشاريع الروبوت؟",
+        options: ["قياس درجة حرارة الجو", "اكتشاف وجود العوائق أو تتبع الخط الأسود", "إصدار أصوات تنبيهية", "تخزين الطاقة"]
       },
       en: {
-        q: "7. What does the GND pin stand for on Arduino?",
-        options: ["Ground Network Data", "Ground (0V reference for circuits)", "Gain Normal Direct", "Geared Node Driver"]
+        q: "7. What is the primary function of the IR Sensor in robotics projects?",
+        options: ["Measuring ambient temperature", "Detecting obstacles or line following", "Emitting warning sounds", "Storing electrical energy"]
       }
     },
     {
       id: 8,
-      correct: 3,
+      correct: 3, // C
       ar: {
-        q: "8. ما هي وظيفة منافذ PWM (المميزة بعلامة ~ بجانب الرقم)؟",
-        options: ["قياس درجة حرارة اللوحة", "توصيل الإنترنت اللاسلكي", "محاكاة الإشارات التناظرية للتحكم بالسرعة والسطوع", "حفظ الملفات"]
+        q: "8. يُستخدم حساس اللمس (Touch Sensor) عادةً كبديل إلكتروني لـ:",
+        options: ["الشاشات", "المقاومات", "الأزرار والمفاتيح (Push Buttons)", "البطاريات"]
       },
       en: {
-        q: "8. What is the function of PWM pins (marked with ~)?",
-        options: ["Measure board temperature", "Connect to Wi-Fi", "Simulate analog output to control speed & brightness", "Store local files"]
+        q: "8. A Touch Sensor is commonly used as an electronic replacement for:",
+        options: ["Displays", "Resistors", "Push Buttons and switches", "Batteries"]
       }
     },
     {
       id: 9,
-      correct: 3,
+      correct: 2, // B
       ar: {
-        q: "9. ما هو الجهد الموصى به لمقبس الطاقة الخارجي (DC Barrel Jack)؟",
-        options: ["1V إلى 3V", "50V إلى 100V", "7V إلى 12V", "220V تيار متردد"]
+        q: "9. في برمجة البلوكات، لتشغيل الـ LED وجعله يضيء نختار حالة المنفذ لتكون:",
+        options: ["LOW", "HIGH", "INPUT", "0"]
       },
       en: {
-        q: "9. What is the recommended input voltage for the DC Barrel Jack?",
-        options: ["1V to 3V", "50V to 100V", "7V to 12V", "220V AC"]
+        q: "9. In block-based programming, to turn the LED ON and make it light up, we set the pin state to:",
+        options: ["LOW", "HIGH", "INPUT", "0"]
       }
     },
     {
       id: 10,
-      correct: 3,
+      correct: 3, // C
       ar: {
-        q: "10. ما هي وظيفة الدالة ()setup في كود الأردوينو؟",
-        options: ["تكرار الكود إلى ما لا نهاية", "إغلاق برنامج الأردوينو", "تنفيذ الأوامر مرة واحدة فقط عند بدء التشغيل لتهيئة الإعدادات", "حساب المعادلات الرياضية"]
+        q: "10. المنافذ الرقمية (Digital Pins) في لوحة Arduino Uno تقرأ أو تخرج إشارات بقيم:",
+        options: ["تتراوح بين 0 و 1023", "مستمرة متغيرة (Analog)", "HIGH أو LOW فقط (1 أو 0)", "قيم سالبة فقط"]
       },
       en: {
-        q: "10. What is the role of the setup() function in Arduino code?",
-        options: ["Repeat code infinitely", "Close the Arduino IDE", "Execute instructions once at startup for configuration", "Calculate complex math"]
+        q: "10. Digital Pins on the Arduino Uno read or output signals with values of:",
+        options: ["Ranging between 0 and 1023", "Continuous variable values (Analog)", "HIGH or LOW only (1 or 0)", "Negative values only"]
       }
     },
     {
       id: 11,
-      correct: 1,
+      correct: 2, // B
       ar: {
-        q: "11. ما هي وظيفة الدالة ()loop في كود الأردوينو؟",
-        options: ["تكرار تنفيذ الأوامر باستمرار وبشكل دوري", "تنفيذ الكود مرة واحدة فقط", "إعادة تسمية الملف", "مسح الكود"]
+        q: "11. يعتبر حساس اللمس (Touch Sensor) من وحدات:",
+        options: ["الإخراج (Output)", "الإدخال (Input)", "معالجة البيانات", "إصدار الصوت"]
       },
       en: {
-        q: "11. What is the role of the loop() function in Arduino code?",
-        options: ["Continuously repeat executing the code in a loop", "Execute the code once only", "Rename the sketch file", "Delete the program"]
+        q: "11. The Touch Sensor is considered one of the:",
+        options: ["Output units", "Input units", "Data processing units", "Sound generating units"]
       }
     },
     {
       id: 12,
-      correct: 3,
+      correct: 3, // C
       ar: {
-        q: "12. أي أمر برمجي يُستخدم لتحديد وضعية المنفذ (مدخل INPUT أو مخرج OUTPUT)؟",
-        options: ["digitalRead()", "delay()", "pinMode()", "Serial.print()"]
+        q: "12. ما هو المنفذ (Pin) في لوحة Arduino Uno الذي نوصل به الطرف السالب للـ Buzzer أو الـ LED؟",
+        options: ["5V", "3.3V", "GND", "Vin"]
       },
       en: {
-        q: "12. Which function is used to configure a pin as INPUT or OUTPUT?",
-        options: ["digitalRead()", "delay()", "pinMode()", "Serial.print()"]
+        q: "12. Which pin on the Arduino Uno connects to the negative lead of a Buzzer or LED?",
+        options: ["5V", "3.3V", "GND", "Vin"]
       }
     },
     {
       id: 13,
-      correct: 2,
+      correct: 1, // A
       ar: {
-        q: "13. لإخراج جهد كهربائي HIGH (تشغيل) على منفذ رقمي معين، نستخدم الأمر:",
-        options: ["analogRead()", "digitalWrite(pin, HIGH)", "pinMode(pin, HIGH)", "delay(1000)"]
+        q: "13. ماذا يفعل حساس الـ IR عندما يكتشف جسماً أو عائقاً أمامه؟",
+        options: ["يرسل إشارة إلى الأردوينو ليخبره بوجود جسم", "يقوم بإطفاء لوحة الأردوينو تماماً", "يصدر صوتاً عاليًا بنفسه", "يقوم بتبريد المكان"]
       },
       en: {
-        q: "13. To output a HIGH voltage (turn ON) to a digital pin, we use:",
-        options: ["analogRead()", "digitalWrite(pin, HIGH)", "pinMode(pin, HIGH)", "delay(1000)"]
+        q: "13. What does the IR Sensor do when it detects an object or obstacle ahead?",
+        options: ["Sends a signal to Arduino notifying it of an object", "Completely turns off the Arduino board", "Emits a loud sound by itself", "Cools down the room"]
       }
     },
     {
       id: 14,
-      correct: 1,
+      correct: 2, // B
       ar: {
-        q: "14. ما هي الدالة البرمجية المسؤولة عن إيقاف تنفيذ البرنامج مؤقتًا لفترة زمنية محددة بالمللي ثانية؟",
-        options: ["delay()", "stop()", "pause()", "wait()"]
+        q: "14. لتشغيل الـ Buzzer كمنبه وإيقافه بعد ثانيتين باستخدام البلوكات، نضع بلوك:",
+        options: ["Repeat (تكرار)", "Wait / Delay (انتظار 2 ثانية)", "Reset (إعادة تشغيل)", "Analog Read (قراءة تناظرية)"]
       },
       en: {
-        q: "14. Which function pauses the program for a specified time in milliseconds?",
-        options: ["delay()", "stop()", "pause()", "wait()"]
+        q: "14. To sound the Buzzer as an alarm and stop it after 2 seconds using blocks, we insert a block for:",
+        options: ["Repeat", "Wait / Delay (wait 2 seconds)", "Reset", "Analog Read"]
       }
     },
     {
       id: 15,
-      correct: 2,
+      correct: 2, // B
       ar: {
-        q: "15. ما هي وحدة قياس الزمن في دالة (1000)delay؟",
-        options: ["دقيقة واحدة (1 Minute)", "1000 مللي ثانية (تساوي ثانية واحدة)", "ساعة واحدة (1 Hour)", "10 ثوانٍ"]
+        q: "15. لتشغيل نظام إنذار حريق متكامل، أفضل توليفة من المكونات التالية هي:",
+        options: ["LED + Touch Sensor", "MQ-2 + Buzzer + Arduino Uno", "DHT11 + IR Sensor", "Touch Sensor + IR Sensor"]
       },
       en: {
-        q: "15. What duration of time does delay(1000) represent?",
-        options: ["1 Minute", "1000 Milliseconds (equal to 1 second)", "1 Hour", "10 Seconds"]
+        q: "15. To build a complete fire alarm system, the best combination of components is:",
+        options: ["LED + Touch Sensor", "MQ-2 + Buzzer + Arduino Uno", "DHT11 + IR Sensor", "Touch Sensor + IR Sensor"]
       }
     }
   ];
