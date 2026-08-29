@@ -238,18 +238,46 @@
     },
   ];
 
-  function normalizeArabic(text) {
+  function normalizeText(text) {
     if (!text) return "";
     return text
       .trim()
       .toLowerCase()
-      .replace(/[\u064B-\u065F\u0670]/g, "")
+      .replace(/[\u064B-\u065F\u0670\u0640]/g, "") // Diacritics & tatweel
       .replace(/[أإآٱ]/g, "ا")
       .replace(/ة/g, "ه")
       .replace(/ى/g, "ي")
-      .replace(/ك/g, "ك")
-      .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "")
-      .replace(/\s+/g, " ");
+      .replace(/ؤ/g, "و")
+      .replace(/ئ/g, "ي")
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()\[\]<>?'"\\|]/g, " ") // punctuation to space
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // Calculate Levenshtein distance for controlled typo tolerance
+  function levenshteinDistance(s1, s2) {
+    const len1 = s1.length;
+    const len2 = s2.length;
+    const matrix = [];
+
+    for (let i = 0; i <= len1; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= len2; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1,      // insertion
+          matrix[i - 1][j - 1] + cost // substitution
+        );
+      }
+    }
+    return matrix[len1][len2];
   }
 
   const cardsContainer = document.getElementById("cardsContainer");
@@ -364,15 +392,29 @@
   let isSubmitted = false;
 
   function matchAnswer(userVal, allowedAnswers) {
-    if (!userVal || userVal.length === 0) return false;
-    const normUser = normalizeArabic(userVal);
+    if (!userVal || userVal.trim().length === 0) return false;
+    const normUser = normalizeText(userVal);
     if (normUser.length === 0) return false;
 
     return allowedAnswers.some(ans => {
-      const normTarget = normalizeArabic(ans);
+      const normTarget = normalizeText(ans);
+      
+      // 1. Exact match after normalization
       if (normTarget === normUser) return true;
-      if (normTarget.length >= 3 && normUser.includes(normTarget)) return true;
-      if (normUser.length >= 3 && normTarget.includes(normUser)) return true;
+
+      // 2. Multi-word phrase inclusion (e.g. "زر اعاده ضبط الاردوينو" -> "زر اعاده الضبط")
+      if (normTarget.length >= 4 && normUser.includes(normTarget)) return true;
+      if (normUser.length >= 4 && normTarget.includes(normUser)) return true;
+
+      // 3. Controlled Levenshtein Typo Tolerance (max distance 1 for 4-6 chars, max 2 for 7+ chars)
+      const targetLen = normTarget.length;
+      const userLen = normUser.length;
+      if (Math.abs(targetLen - userLen) <= 2) {
+        const dist = levenshteinDistance(normUser, normTarget);
+        if (targetLen >= 4 && targetLen <= 6 && dist <= 1) return true;
+        if (targetLen >= 7 && dist <= 2) return true;
+      }
+
       return false;
     });
   }
