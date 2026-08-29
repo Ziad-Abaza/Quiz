@@ -136,8 +136,11 @@
         session.scores[quizId] = {
           score: safeScore,
           maxScore: safeMaxScore,
-          answers: safeMetadata.answers || [],
-          quizTitle: safeMetadata.quizTitle || null,
+          answers: (safeMetadata.answers || []).map(a => ({
+            quizId: a.quizId || quizId,
+            questionId: a.questionId,
+            studentAnswer: a.studentAnswer !== undefined ? a.studentAnswer : ""
+          })),
           completedAt: new Date().toISOString()
         };
         localStorage.setItem(keys.currentSession, JSON.stringify(session));

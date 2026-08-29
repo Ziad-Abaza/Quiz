@@ -316,51 +316,33 @@
 
     // Calculate score exactly matching [2, 2, 2, 3, 2, 1, 2, 3, 3, 3, 1, 3, 2, 1, 2]
     let score = 0;
-    const answerDetails = [];
+    const optionLetters = ["A", "B", "C", "D"];
+    const answerRecords = [];
 
     questionsData.forEach((q, idx) => {
       const expected = correctAnswers[idx];
       const selected = userAnswers[q.id];
-      const isCorrect = selected === expected;
-      if (isCorrect) score++;
+      if (selected === expected) {
+        score++;
+      }
 
-      const selectedOptAr = selected ? q.ar.options[selected - 1] : "(بدون إجابة)";
-      const selectedOptEn = selected ? q.en.options[selected - 1] : "(No answer)";
-      const correctOptAr = q.ar.options[expected - 1];
-      const correctOptEn = q.en.options[expected - 1];
+      const letter = selected ? (optionLetters[selected - 1] || String(selected)) : "";
 
-      answerDetails.push({
+      answerRecords.push({
+        quizId: "arduino-mcq",
         questionId: q.id,
-        questionText: {
-          ar: q.ar.q,
-          en: q.en.q
-        },
-        studentAnswer: {
-          ar: selectedOptAr,
-          en: selectedOptEn,
-          optionIndex: selected || null
-        },
-        correctAnswer: {
-          ar: correctOptAr,
-          en: correctOptEn,
-          optionIndex: expected
-        },
-        isCorrect: isCorrect
+        studentAnswer: letter
       });
     });
 
-    // Submit via standard QuizSDK with complete metadata snapshot
+    // Submit via standard QuizSDK
     if (window.QuizSDK) {
       window.QuizSDK.submitScore({
         score: score,
         maxScore: 15,
         metadata: {
-          quizId: "quiz-arduino-basics-mcq",
-          quizTitle: {
-            ar: "اختبار أساسيات الأردوينو",
-            en: "Arduino Basics Quiz"
-          },
-          answers: answerDetails
+          quizId: "arduino-mcq",
+          answers: answerRecords
         }
       });
     }

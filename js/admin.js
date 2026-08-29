@@ -247,47 +247,25 @@
         const answers = quizData.answers || [];
 
         if (answers.length === 0) {
-          qListEl.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem;">${lang === "ar" ? "تم تسجيل الدرجة الكلية فقط لهذا الاختبار." : "Only total score recorded for this quiz."}</div>`;
+          qListEl.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem;">${lang === "ar" ? "لا توجد إجابات مسجلة لهذا الاختبار." : "No answers recorded for this quiz."}</div>`;
         } else {
           answers.forEach((ans, qIdx) => {
-            const isCorrect = Boolean(ans.isCorrect);
             const qCard = document.createElement("div");
-            qCard.className = `review-question-card ${isCorrect ? "is-correct" : "is-wrong"}`;
+            qCard.className = "review-question-card";
 
-            let qPrompt = typeof ans.questionText === "object" ? 
-              (ans.questionText[lang] || ans.questionText.ar || ans.questionText.en || `السؤال #${qIdx + 1}`) : 
-              (ans.questionText || `Question #${qIdx + 1}`);
-
-            let studentAnsText = typeof ans.studentAnswer === "object" ?
-              (ans.studentAnswer[lang] || ans.studentAnswer.ar || ans.studentAnswer.en || "") :
-              (ans.studentAnswer || "");
-
-            let correctAnsText = typeof ans.correctAnswer === "object" ?
-              (ans.correctAnswer[lang] || ans.correctAnswer.ar || ans.correctAnswer.en || "") :
-              (ans.correctAnswer || "");
-
-            const statusText = isCorrect ? 
-              (lang === "ar" ? "إجابة صحيحة ✅" : "Correct ✅") : 
-              (lang === "ar" ? "إجابة خاطئة ❌" : "Incorrect ❌");
-            const statusColor = isCorrect ? "#16A34A" : "#E11D48";
+            const qNum = ans.questionId !== undefined ? ans.questionId : (qIdx + 1);
+            let ansText = typeof ans.studentAnswer === "object" ?
+              (ans.studentAnswer[lang] || ans.studentAnswer.ar || ans.studentAnswer.en || JSON.stringify(ans.studentAnswer)) :
+              String(ans.studentAnswer !== undefined && ans.studentAnswer !== "" ? ans.studentAnswer : (lang === "ar" ? "(بدون إجابة)" : "(No answer)"));
 
             qCard.innerHTML = `
               <div class="review-question-prompt">
-                <span>${escapeHtml(qPrompt)}</span>
+                <span>${lang === "ar" ? `السؤال #${qNum}` : `Question #${qNum}`}</span>
               </div>
               <div class="review-answer-row">
                 <div>
-                  <span class="review-ans-label">${lang === "ar" ? "إجابة الطالب:" : "Student's Answer:"} </span>
-                  <span class="review-ans-val" style="color: ${statusColor};">${escapeHtml(studentAnsText)}</span>
-                </div>
-                <div style="font-weight: 800; color: ${statusColor}; font-size: 0.85rem;">
-                  ${statusText}
-                </div>
-              </div>
-              <div class="review-answer-row" style="margin-top: 4px;">
-                <div>
-                  <span class="review-ans-label">${lang === "ar" ? "الإجابة النموذجية الصحيحة:" : "Correct Answer:"} </span>
-                  <span class="review-ans-val" style="color: #16A34A;">${escapeHtml(correctAnsText)}</span>
+                  <span class="review-ans-label">${lang === "ar" ? "إجابة الطالب:" : "Student Answer:"} </span>
+                  <span class="review-ans-val" style="color: var(--brand-primary); font-size: 1rem;">${escapeHtml(ansText)}</span>
                 </div>
               </div>
             `;

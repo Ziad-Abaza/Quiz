@@ -167,11 +167,24 @@ function recordStudentSubmission(sheet, payload) {
     });
   }
 
-  var totalScore = Number(payload.totalScore !== undefined ? payload.totalScore : computedTotalScore);
-  var totalMaxScore = Number(payload.totalMaxScore !== undefined ? payload.totalMaxScore : (computedTotalMaxScore > 0 ? computedTotalMaxScore : 34));
-  var percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
+  // Flatten all answers from all completed quizzes into a clean list of { quizId, questionId, studentAnswer }
+  var answersList = [];
+  if (typeof scores === "object") {
+    Object.keys(scores).forEach(function(quizKey) {
+      var qAnswers = scores[quizKey] && scores[quizKey].answers;
+      if (Array.isArray(qAnswers)) {
+        qAnswers.forEach(function(ans) {
+          answersList.push({
+            quizId: ans.quizId || quizKey,
+            questionId: ans.questionId,
+            studentAnswer: ans.studentAnswer !== undefined ? ans.studentAnswer : ""
+          });
+        });
+      }
+    });
+  }
 
-  var answersJson = JSON.stringify(scores);
+  var answersJson = JSON.stringify(answersList.length > 0 ? answersList : scores);
 
   var newRow = [
     sessionId,
@@ -238,19 +251,37 @@ function fetchAllRecords(sheet) {
 
     // Parse detailed answers JSON if present in column 14
     var parsedScores = {
-      "quiz-arduino-hardware": { score: Number(row[5]) || 0, maxScore: 9 },
-      "quiz-arduino-basics-mcq": { score: Number(row[6]) || 0, maxScore: 15 },
-      "quiz-arduino-sensors-mcq": { score: Number(row[7]) || 0, maxScore: 10 }
+      "quiz-arduino-hardware": { score: Number(row[5]) || 0, maxScore: 9, answers: [] },
+      "quiz-arduino-basics-mcq": { score: Number(row[6]) || 0, maxScore: 15, answers: [] },
+      "quiz-arduino-sensors-mcq": { score: Number(row[7]) || 0, maxScore: 10, answers: [] }
     };
 
     if (row[13]) {
       try {
         var rawParsed = JSON.parse(row[13]);
-        if (rawParsed && typeof rawParsed === "object") {
+        if (Array.isArray(rawParsed)) {
+          // Flat list of { quizId, questionId, studentAnswer }
+          rawParsed.forEach(function(item) {
+            var qId = item.quizId;
+            if (qId === "arduino") qId = "quiz-arduino-hardware";
+            if (qId === "arduino-mcq") qId = "quiz-arduino-basics-mcq";
+            if (qId === "arduino-sensors-mcq") qId = "quiz-arduino-sensors-mcq";
+
+            if (!parsedScores[qId]) {
+              parsedScores[qId] = { score: 0, maxScore: 0, answers: [] };
+            }
+            parsedScores[qId].answers = parsedScores[qId].answers || [];
+            parsedScores[qId].answers.push({
+              quizId: item.quizId,
+              questionId: item.questionId,
+              studentAnswer: item.studentAnswer
+            });
+          });
+        } else if (rawParsed && typeof rawParsed === "object") {
           parsedScores = rawParsed;
         }
       } catch (err) {
-        // Use default fallback
+        // Fallback
       }
     }
 
