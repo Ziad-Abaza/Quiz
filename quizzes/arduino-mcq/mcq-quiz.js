@@ -350,6 +350,12 @@
       });
     }
 
+    if (window.QuizSDK) {
+      window.QuizSDK.onLanguageChange(() => {
+        renderQuestion();
+      });
+    }
+
     renderQuestion();
   }
 

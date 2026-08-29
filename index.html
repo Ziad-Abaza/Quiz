@@ -10,27 +10,26 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- Utility Bar: Language Switcher & Admin Link -->
+    <!-- Clean Top Utility Bar (Language Toggle Only) -->
     <div class="utility-bar">
       <button type="button" id="langSwitchBtn" class="lang-switcher-btn">
         English
       </button>
-      <a href="admin.html" class="admin-link-inline" data-i18n="common.teacherPortal">
-        🛡️ Teacher Portal
-      </a>
     </div>
 
-    <!-- Student Info Header (Displays active student info) -->
+    <!-- Enhanced Student Info Header (Displays active student info) -->
     <header class="app-header student-header animate-pop" id="globalStudentHeader" style="display: none;">
       <div class="student-profile-badge">
-        <span class="student-avatar-icon animate-bounce">🧑‍🚀</span>
+        <div class="student-avatar-icon-wrapper">
+          <span class="student-avatar-icon">🧑‍🚀</span>
+        </div>
         <div class="student-meta">
           <span class="student-name-text" id="headerStudentName">Student Explorer</span>
           <span class="student-class-badge" id="headerStudentGrade">Senior 7</span>
         </div>
       </div>
       <div class="header-right-meta">
-        <span class="badge badge-primary" id="headerQuizStatus" data-i18n="runner.activeStatus">🚀 Quiz Adventure Active</span>
+        <span class="badge badge-primary status-pulse-badge" id="headerQuizStatus" data-i18n="runner.activeStatus">🚀 Quiz Adventure Active</span>
       </div>
     </header>
 

@@ -66,8 +66,15 @@
     }
 
     if (window.I18n) {
-      window.I18n.onLanguageChange(() => {
+      window.I18n.onLanguageChange((newLang) => {
         updateDynamicTexts();
+        // Broadcast language change to currently loaded iframe
+        if (quizFrame && quizFrame.contentWindow) {
+          quizFrame.contentWindow.postMessage({
+            type: "PLATFORM_LANG_CHANGE",
+            lang: newLang
+          }, "*");
+        }
       });
     }
 
@@ -144,7 +151,18 @@
     const progressPct = Math.round((index / manifest.length) * 100);
     runnerProgressBar.style.width = progressPct + "%";
 
-    // Load iframe
+    // Load iframe and sync active language immediately on load
+    quizFrame.onload = function() {
+      const activeLang = (window.I18n && window.I18n.getLang()) || localStorage.getItem("quiz_platform_lang") || "ar";
+      try {
+        quizFrame.contentWindow.postMessage({
+          type: "PLATFORM_LANG_CHANGE",
+          lang: activeLang
+        }, "*");
+      } catch (e) {
+        console.warn("Could not postMessage to iframe:", e);
+      }
+    };
     quizFrame.src = quiz.path;
   }
 

@@ -299,6 +299,12 @@
   function applyLanguage() {
     const lang = getLang();
     const texts = i18nTexts[lang];
+
+    // Direction, Language & Font family exactly like mcq-quiz.js
+    const dir = lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.setAttribute("dir", dir);
+    document.documentElement.setAttribute("lang", lang);
+
     const badgeTitle = document.getElementById("quizBadgeTitle");
     const instr = document.getElementById("quizInstructionText");
     const checkTxt = document.getElementById("checkBtnText");
@@ -330,6 +336,12 @@
 
     if (window.I18n) {
       window.I18n.onLanguageChange(() => {
+        applyLanguage();
+      });
+    }
+
+    if (window.QuizSDK) {
+      window.QuizSDK.onLanguageChange(() => {
         applyLanguage();
       });
     }
