@@ -115,9 +115,30 @@
     cachedResults = results;
     statTotalStudents.textContent = results.length;
 
-    // Calculate Average
+    // Normalize and dynamically calculate percentage for every record
+    results.forEach(function(student) {
+      // If totalMaxScore is not present or percentage is missing/0, compute dynamically from scores dictionary or totals
+      var totalScore = 0;
+      var totalMaxScore = 0;
+
+      if (student.scores && typeof student.scores === "object" && Object.keys(student.scores).length > 0) {
+        Object.values(student.scores).forEach(function(item) {
+          totalScore += Number(item.score) || 0;
+          totalMaxScore += Number(item.maxScore) || 0;
+        });
+      } else {
+        totalScore = Number(student.totalScore) || 0;
+        totalMaxScore = Number(student.totalMaxScore) || 0;
+      }
+
+      student.totalScore = totalScore;
+      student.totalMaxScore = totalMaxScore;
+      student.percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : (Number(student.percentage) || 0);
+    });
+
+    // Calculate Average Class Score from actual students percentages
     if (results.length > 0) {
-      const sum = results.reduce(function(acc, curr) { return acc + (curr.percentage || 0); }, 0);
+      const sum = results.reduce(function(acc, curr) { return acc + (Number(curr.percentage) || 0); }, 0);
       statAverageScore.textContent = Math.round(sum / results.length) + "%";
     } else {
       statAverageScore.textContent = "0%";
@@ -146,13 +167,14 @@
     results.forEach(function(student, idx) {
       const tr = document.createElement("tr");
       const completedTime = student.completedAt ? new Date(student.completedAt).toLocaleString() : (student.timestamp || "N/A");
-      const pctBadge = student.percentage >= 80 ? "badge-success" : "badge-primary";
+      const pctValue = Number(student.percentage) || 0;
+      const pctBadge = pctValue >= 80 ? "badge-success" : "badge-primary";
 
       tr.innerHTML = '<td><strong>' + (idx + 1) + '</strong></td>' +
         '<td><strong>' + escapeHtml(student.name) + '</strong></td>' +
         '<td><span class="badge badge-primary">' + escapeHtml(student.grade) + '</span></td>' +
         '<td>' + student.totalScore + ' / ' + student.totalMaxScore + ' pts</td>' +
-        '<td><span class="badge ' + pctBadge + '">' + student.percentage + '%</span></td>' +
+        '<td><span class="badge ' + pctBadge + '">' + pctValue + '%</span></td>' +
         '<td style="color: var(--text-muted); font-size: 0.85rem;">' + completedTime + '</td>';
       resultsTableBody.appendChild(tr);
     });

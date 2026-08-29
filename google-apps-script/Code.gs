@@ -123,8 +123,18 @@ function recordStudentSubmission(sheet, payload) {
   var mcqScore = (scores["quiz-arduino-basics-mcq"] && Number(scores["quiz-arduino-basics-mcq"].score)) || 0;
   var sensorsScore = (scores["quiz-arduino-sensors-mcq"] && Number(scores["quiz-arduino-sensors-mcq"].score)) || 0;
 
-  var totalScore = Number(payload.totalScore !== undefined ? payload.totalScore : (hwScore + mcqScore + sensorsScore));
-  var totalMaxScore = Number(payload.totalMaxScore !== undefined ? payload.totalMaxScore : 34);
+  // Dynamically compute total earned score and total available max score across ALL quizzes submitted
+  var computedTotalScore = 0;
+  var computedTotalMaxScore = 0;
+  if (typeof scores === "object" && Object.keys(scores).length > 0) {
+    Object.keys(scores).forEach(function(key) {
+      computedTotalScore += Number(scores[key].score) || 0;
+      computedTotalMaxScore += Number(scores[key].maxScore) || 0;
+    });
+  }
+
+  var totalScore = Number(payload.totalScore !== undefined ? payload.totalScore : computedTotalScore);
+  var totalMaxScore = Number(payload.totalMaxScore !== undefined ? payload.totalMaxScore : (computedTotalMaxScore > 0 ? computedTotalMaxScore : 34));
   var percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
 
   var newRow = [
@@ -149,6 +159,7 @@ function recordStudentSubmission(sheet, payload) {
     sessionId: sessionId,
     studentName: studentName,
     totalScore: totalScore,
+    totalMaxScore: totalMaxScore,
     percentage: percentage
   };
 }
@@ -180,6 +191,14 @@ function fetchAllRecords(sheet) {
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
+    var rowTotal = Number(row[8]) || 0;
+    var rowMax = Number(row[9]) || 0;
+    
+    // Parse percentage safely from column 10 or calculate dynamically from total / max
+    var rawPctStr = String(row[10] || "").replace("%", "").trim();
+    var parsedPct = parseInt(rawPctStr, 10);
+    var finalPct = !isNaN(parsedPct) && parsedPct > 0 ? parsedPct : (rowMax > 0 ? Math.round((rowTotal / rowMax) * 100) : 0);
+
     results.push({
       id: row[0],
       studentId: row[1],
@@ -191,9 +210,9 @@ function fetchAllRecords(sheet) {
         "quiz-arduino-basics-mcq": { score: Number(row[6]) || 0, maxScore: 15 },
         "quiz-arduino-sensors-mcq": { score: Number(row[7]) || 0, maxScore: 10 }
       },
-      totalScore: Number(row[8]) || 0,
-      totalMaxScore: Number(row[9]) || 34,
-      percentage: parseInt(String(row[10]).replace("%", ""), 10) || 0,
+      totalScore: rowTotal,
+      totalMaxScore: rowMax > 0 ? rowMax : 34,
+      percentage: finalPct,
       completedAt: row[11],
       timestamp: row[12]
     });
