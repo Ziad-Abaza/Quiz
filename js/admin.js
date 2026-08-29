@@ -93,10 +93,26 @@
     renderDashboard();
   }
 
-  function renderDashboard(filterQuery) {
+  let cachedResults = [];
+
+  async function renderDashboard(filterQuery) {
     filterQuery = filterQuery || "";
-    const results = storage.getAllResults();
     statTotalQuizzes.textContent = manifest.length;
+
+    // Load from centralized Google Sheets if configured, otherwise fallback to LocalStorage
+    let results = [];
+    if (window.QuizSheetsApi && window.QuizSheetsApi.isConfigured()) {
+      const remoteResults = await window.QuizSheetsApi.fetchAllResults();
+      if (remoteResults && Array.isArray(remoteResults)) {
+        results = remoteResults;
+      } else {
+        results = storage.getAllResults();
+      }
+    } else {
+      results = storage.getAllResults();
+    }
+
+    cachedResults = results;
     statTotalStudents.textContent = results.length;
 
     // Calculate Average
@@ -129,7 +145,7 @@
 
     results.forEach(function(student, idx) {
       const tr = document.createElement("tr");
-      const completedTime = student.completedAt ? new Date(student.completedAt).toLocaleString() : "N/A";
+      const completedTime = student.completedAt ? new Date(student.completedAt).toLocaleString() : (student.timestamp || "N/A");
       const pctBadge = student.percentage >= 80 ? "badge-success" : "badge-primary";
 
       tr.innerHTML = '<td><strong>' + (idx + 1) + '</strong></td>' +
@@ -143,18 +159,23 @@
   }
 
   function handleSearch(e) {
-    renderDashboard(e.target.value);
+    const query = e.target.value.toLowerCase().trim();
+    const filtered = cachedResults.filter(function(r) { 
+      return (r.name && r.name.toLowerCase().indexOf(query) !== -1) || 
+             (r.grade && r.grade.toLowerCase().indexOf(query) !== -1);
+    });
+    renderTable(filtered);
   }
 
   function handleDownloadTxt() {
-    const results = storage.getAllResults();
+    const results = cachedResults.length > 0 ? cachedResults : storage.getAllResults();
     if (results.length === 0) {
       alert(window.I18n ? window.I18n.t("admin.emptyTitle") : "No student records available to export yet.");
       return;
     }
 
     const reportContent = exporter.generateTxtReport(results, manifest);
-    const filename = "Quiz_Platform_Results_" + new Date().toISOString().slice(0, 10) + ".txt";
+    const filename = "Quiz_Platform_Centralized_Results_" + new Date().toISOString().slice(0, 10) + ".txt";
     exporter.downloadTxtFile(filename, reportContent);
   }
 

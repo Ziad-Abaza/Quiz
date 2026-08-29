@@ -182,7 +182,52 @@
       // Register student permanently in completed registry & lock device
       this.registerCompletedStudent(session);
 
+      // Enqueue for Google Sheets synchronization
+      this.enqueueForSheetsSync(session);
+
       return session;
+    },
+
+    // --- Google Sheets Sync Queue & Retry ---
+    getPendingSyncQueue() {
+      try {
+        const raw = localStorage.getItem(keys.pendingSyncQueue);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    },
+
+    enqueueForSheetsSync(session) {
+      const queue = this.getPendingSyncQueue();
+      if (!queue.some(item => item.id === session.id)) {
+        queue.push(session);
+        localStorage.setItem(keys.pendingSyncQueue, JSON.stringify(queue));
+      }
+      this.flushSyncQueue();
+    },
+
+    removeFromSyncQueue(sessionId) {
+      const queue = this.getPendingSyncQueue().filter(item => item.id !== sessionId);
+      localStorage.setItem(keys.pendingSyncQueue, JSON.stringify(queue));
+    },
+
+    async flushSyncQueue() {
+      if (!window.QuizSheetsApi || !window.QuizSheetsApi.isConfigured()) return;
+
+      const queue = this.getPendingSyncQueue();
+      if (queue.length === 0) return;
+
+      for (const session of queue) {
+        try {
+          const res = await window.QuizSheetsApi.submitSessionResult(session);
+          if (res && (res.success || res.duplicate)) {
+            this.removeFromSyncQueue(session.id);
+          }
+        } catch (e) {
+          console.warn("Background sync retry error for session:", session.id, e);
+        }
+      }
     },
 
     clearCurrentSession() {
@@ -204,6 +249,7 @@
       localStorage.setItem(keys.allResults, JSON.stringify([]));
       localStorage.setItem(keys.completedStudents, JSON.stringify([]));
       localStorage.removeItem(keys.deviceLocked);
+      localStorage.removeItem(keys.pendingSyncQueue);
     },
 
     // --- Admin Authentication ---
@@ -224,4 +270,8 @@
   };
 
   window.QuizStorage = StorageManager;
+  // Trigger background flush on start if online
+  window.addEventListener("online", () => {
+    StorageManager.flushSyncQueue();
+  });
 })(window);

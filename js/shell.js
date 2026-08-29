@@ -181,15 +181,32 @@
     }
   }
 
-  function handleRegistration(e) {
+  async function handleRegistration(e) {
     e.preventDefault();
     const name = studentNameInput.value.trim();
     const grade = studentGradeSelect.value;
     const regAlertBox = document.getElementById("regAlertBox");
+    const startExamBtn = document.getElementById("startExamBtn");
 
     if (!name || !grade) return;
 
+    // Optional: show loading state on button
+    const origBtnText = startExamBtn ? startExamBtn.innerHTML : "";
+    if (startExamBtn) {
+      startExamBtn.disabled = true;
+      startExamBtn.textContent = window.I18n ? window.I18n.t("common.loading") : "Loading...";
+    }
+
     try {
+      // 1. Centralized Google Sheets Anti-Retake Verification
+      if (window.QuizSheetsApi && window.QuizSheetsApi.isConfigured()) {
+        const isCompletedOnline = await window.QuizSheetsApi.checkStudentCompletion({ name, grade });
+        if (isCompletedOnline) {
+          throw new Error("STUDENT_ALREADY_COMPLETED");
+        }
+      }
+
+      // 2. Start local validated session
       const session = storage.startSession(name, grade);
       if (regAlertBox) regAlertBox.style.display = "none";
       startQuizFlow(session);
@@ -206,7 +223,14 @@
             "Device is locked.";
           const deviceLockedActions = document.getElementById("deviceLockedActions");
           if (deviceLockedActions) deviceLockedActions.style.display = "block";
+        } else {
+          regAlertBox.textContent = err.message;
         }
+      }
+    } finally {
+      if (startExamBtn) {
+        startExamBtn.disabled = storage.isDeviceLocked();
+        startExamBtn.innerHTML = origBtnText;
       }
     }
   }
