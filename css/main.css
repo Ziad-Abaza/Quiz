@@ -1,0 +1,384 @@
+/* ==========================================================================
+   Design System & UI Specification: Children's Tech Academy
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  /* 1. Brand & Foundation Colors */
+  --brand-primary: #0E1D4A;       /* Deep Space Navy */
+  --brand-accent: #009688;        /* Teal / University Cyan */
+  --brand-accent-hover: #00A896;
+  --canvas-bg: #FAFAFD;           /* Main Application Canvas */
+  --card-surface: #FFFFFF;        /* Default container surface */
+  --border-standard: #E2E8F0;     /* Default neutral outline */
+  --text-primary: #1E293B;        /* Slate-800 High-legibility */
+  --text-muted: #64748B;          /* Slate-500 */
+
+  /* 2. Semantic Step & Module Color Matrix */
+  --module-01-accent: #0CA6A3;
+  --module-01-bg: #F0FDFB;
+  --module-01-border: #99F6E4;
+
+  --module-02-accent: #0284C7;
+  --module-02-bg: #F0F9FF;
+  --module-02-border: #BAE6FD;
+
+  --module-03-accent: #7C3AED;
+  --module-03-bg: #F5F3FF;
+  --module-03-border: #DDD6FE;
+
+  --module-04-accent: #E11D48;
+  --module-04-bg: #FFF1F2;
+  --module-04-border: #FECDD3;
+
+  --module-05-accent: #EA580C;
+  --module-05-bg: #FFF7ED;
+  --module-05-border: #FED7AA;
+
+  --module-06-accent: #16A34A;
+  --module-06-bg: #F0FDF4;
+  --module-06-border: #BBF7D0;
+
+  /* Aliases for core platform */
+  --primary: var(--brand-accent);
+  --primary-dark: #00796B;
+  --primary-light: var(--module-01-bg);
+  --secondary: var(--module-05-accent);
+  --accent-green: var(--module-06-accent);
+  --accent-green-dark: #15803D;
+  --accent-coral: var(--module-04-accent);
+  
+  --shadow-sm: 0 2px 4px rgba(14, 29, 74, 0.04);
+  --shadow-md: 0 4px 14px 0 rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 20px 0 rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 10px 25px -5px rgba(14, 29, 74, 0.06), 0 8px 10px -6px rgba(14, 29, 74, 0.04);
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px; /* 1.25rem per spec */
+  --radius-full: 9999px;
+  
+  --font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--canvas-bg);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(12, 166, 163, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(124, 58, 237, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(2, 132, 199, 0.04) 0%, transparent 50%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Typography & Scale Hierarchy
+   ========================================================================== */
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  color: var(--brand-primary);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 2rem; /* 32px per spec */
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: 1.5rem; /* 24px per spec */
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.125rem; /* 18px per spec */
+  font-weight: 700;
+}
+
+p {
+  color: var(--text-muted);
+  font-size: 0.95rem; /* 15px per spec */
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Common Interactive Elements & Buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+  user-select: none;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-primary {
+  background: var(--brand-accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(0, 150, 136, 0.35);
+}
+
+.btn-primary:hover {
+  background: var(--brand-accent-hover);
+  box-shadow: 0 6px 20px rgba(0, 150, 136, 0.45);
+}
+
+.btn-secondary {
+  background: var(--module-05-accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+}
+
+.btn-secondary:hover {
+  background: #C2410C;
+}
+
+.btn-success {
+  background: var(--module-06-accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.btn-success:hover {
+  background: #15803D;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  border: 2px solid var(--border-standard);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.btn-outline:hover {
+  background: var(--canvas-bg);
+  border-color: var(--brand-accent);
+  color: var(--brand-accent);
+}
+
+/* ==========================================================================
+   Card & Container Layouts (per DESIGN_SYSTEM.md)
+   ========================================================================== */
+
+.card, .edu-card {
+  background-color: var(--card-surface);
+  border-radius: var(--radius-lg); /* 1.25rem / 20px */
+  border: 2px solid var(--border-standard);
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.04);
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover, .edu-card:hover {
+  box-shadow: 0 8px 24px 0 rgba(14, 29, 74, 0.08);
+}
+
+/* Step / Module Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 800; /* ExtraBold */
+  letter-spacing: 0.02em;
+}
+
+.badge-primary {
+  background: var(--module-01-bg);
+  color: var(--module-01-accent);
+  border: 1px solid var(--module-01-border);
+}
+
+.badge-blue {
+  background: var(--module-02-bg);
+  color: var(--module-02-accent);
+  border: 1px solid var(--module-02-border);
+}
+
+.badge-purple {
+  background: var(--module-03-bg);
+  color: var(--module-03-accent);
+  border: 1px solid var(--module-03-border);
+}
+
+.badge-success {
+  background: var(--module-06-bg);
+  color: var(--module-06-accent);
+  border: 1px solid var(--module-06-border);
+}
+
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.form-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brand-primary);
+}
+
+.form-input, .form-select {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 18px;
+  border: 2px solid var(--border-standard);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: #FFFFFF;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--brand-accent);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(0, 150, 136, 0.15);
+}
+
+/* Code & Tech Values */
+.tech-val {
+  font-family: var(--font-mono);
+  background: var(--canvas-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-standard);
+  font-size: 0.9em;
+}
+
+/* ==========================================================================
+   Advanced Playful Animations & Micro-Interactions
+   ========================================================================== */
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(14px);
+  }
+  70% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(0, 150, 136, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(2, 132, 199, 0.4));
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-pop {
+  animation: popIn 0.35s ease-out forwards;
+}
+
+.animate-bounce,
+.animate-pulse-glow,
+.animate-float {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Static clean background styling */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.25;
+  filter: blur(80px);
+}
+
+body::before {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  left: -80px;
+  background: radial-gradient(circle, rgba(12, 166, 163, 0.2) 0%, transparent 70%);
+}
+
+body::after {
+  width: 350px;
+  height: 350px;
+  bottom: -90px;
+  right: -90px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  body::before, body::after {
+    display: none;
+  }
+}

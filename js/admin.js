@@ -1,0 +1,170 @@
+/**
+ * Admin Dashboard Logic & Event Handlers
+ */
+(function() {
+  const storage = window.QuizStorage;
+  const exporter = window.QuizExporter;
+  const manifest = window.QUIZ_MANIFEST || [];
+
+  // DOM Elements
+  const authModal = document.getElementById("authModal");
+  const authForm = document.getElementById("authForm");
+  const adminPasswordInput = document.getElementById("adminPasswordInput");
+  const authError = document.getElementById("authError");
+  const adminContent = document.getElementById("adminContent");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const statTotalStudents = document.getElementById("statTotalStudents");
+  const statAverageScore = document.getElementById("statAverageScore");
+  const statTotalQuizzes = document.getElementById("statTotalQuizzes");
+
+  const searchInput = document.getElementById("searchInput");
+  const resultsTableBody = document.getElementById("resultsTableBody");
+  const downloadTxtBtn = document.getElementById("downloadTxtBtn");
+  const changePwdBtn = document.getElementById("changePwdBtn");
+  const clearDataBtn = document.getElementById("clearDataBtn");
+
+  // State
+  let isAuthenticated = sessionStorage.getItem("admin_authenticated") === "true";
+
+  function init() {
+    if (isAuthenticated) {
+      unlockDashboard();
+    } else {
+      authModal.style.display = "flex";
+      adminContent.style.display = "none";
+    }
+
+    authForm.addEventListener("submit", handleLogin);
+    logoutBtn.addEventListener("click", handleLogout);
+    searchInput.addEventListener("input", handleSearch);
+    downloadTxtBtn.addEventListener("click", handleDownloadTxt);
+    changePwdBtn.addEventListener("click", handleChangePassword);
+    clearDataBtn.addEventListener("click", handleClearData);
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const entered = adminPasswordInput.value;
+
+    if (storage.verifyAdminPassword(entered)) {
+      isAuthenticated = true;
+      sessionStorage.setItem("admin_authenticated", "true");
+      authError.textContent = "";
+      unlockDashboard();
+    } else {
+      authError.textContent = "❌ Incorrect password. Please try again.";
+      adminPasswordInput.value = "";
+      adminPasswordInput.focus();
+    }
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem("admin_authenticated");
+    isAuthenticated = false;
+    authModal.style.display = "flex";
+    adminContent.style.display = "none";
+    adminPasswordInput.value = "";
+  }
+
+  function unlockDashboard() {
+    authModal.style.display = "none";
+    adminContent.style.display = "block";
+    renderDashboard();
+  }
+
+  function renderDashboard(filterQuery) {
+    filterQuery = filterQuery || "";
+    const results = storage.getAllResults();
+    statTotalQuizzes.textContent = manifest.length;
+    statTotalStudents.textContent = results.length;
+
+    // Calculate Average
+    if (results.length > 0) {
+      const sum = results.reduce(function(acc, curr) { return acc + (curr.percentage || 0); }, 0);
+      statAverageScore.textContent = Math.round(sum / results.length) + "%";
+    } else {
+      statAverageScore.textContent = "0%";
+    }
+
+    // Filter results
+    const query = filterQuery.toLowerCase().trim();
+    const filtered = results.filter(function(r) { 
+      return (r.name && r.name.toLowerCase().indexOf(query) !== -1) || 
+             (r.grade && r.grade.toLowerCase().indexOf(query) !== -1);
+    });
+
+    renderTable(filtered);
+  }
+
+  function renderTable(results) {
+    resultsTableBody.innerHTML = "";
+
+    if (results.length === 0) {
+      resultsTableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📋</div><p>No student quiz records found.</p></td></tr>';
+      return;
+    }
+
+    results.forEach(function(student, idx) {
+      const tr = document.createElement("tr");
+      const completedTime = student.completedAt ? new Date(student.completedAt).toLocaleString() : "N/A";
+      const pctBadge = student.percentage >= 80 ? "badge-success" : "badge-primary";
+
+      tr.innerHTML = '<td><strong>' + (idx + 1) + '</strong></td>' +
+        '<td><strong>' + escapeHtml(student.name) + '</strong></td>' +
+        '<td><span class="badge badge-primary">' + escapeHtml(student.grade) + '</span></td>' +
+        '<td>' + student.totalScore + ' / ' + student.totalMaxScore + ' pts</td>' +
+        '<td><span class="badge ' + pctBadge + '">' + student.percentage + '%</span></td>' +
+        '<td style="color: var(--text-muted); font-size: 0.85rem;">' + completedTime + '</td>';
+      resultsTableBody.appendChild(tr);
+    });
+  }
+
+  function handleSearch(e) {
+    renderDashboard(e.target.value);
+  }
+
+  function handleDownloadTxt() {
+    const results = storage.getAllResults();
+    if (results.length === 0) {
+      alert("No student records available to export yet.");
+      return;
+    }
+
+    const reportContent = exporter.generateTxtReport(results, manifest);
+    const filename = "Quiz_Platform_Results_" + new Date().toISOString().slice(0, 10) + ".txt";
+    exporter.downloadTxtFile(filename, reportContent);
+  }
+
+  function handleChangePassword() {
+    const newPwd = prompt("Enter the new Admin password:");
+    if (newPwd !== null) {
+      if (newPwd.trim().length >= 4) {
+        storage.setAdminPassword(newPwd.trim());
+        alert("✅ Admin password updated successfully!");
+      } else {
+        alert("Password must be at least 4 characters long.");
+      }
+    }
+  }
+
+  function handleClearData() {
+    const confirm1 = confirm("⚠️ Are you sure you want to permanently delete all student quiz results?");
+    if (confirm1) {
+      const confirm2 = confirm("This action CANNOT be undone. Type OK to confirm clearing all data.");
+      if (confirm2) {
+        storage.clearAllResults();
+        renderDashboard();
+        alert("Database cleared successfully.");
+      }
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str || "";
+    return div.innerHTML;
+  }
+
+  window.addEventListener("DOMContentLoaded", init);
+})();

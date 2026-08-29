@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Quiz Platform</title>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/shell.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Student Info Header (Displays active student info) -->
+    <header class="app-header student-header animate-pop" id="globalStudentHeader" style="display: none;">
+      <div class="student-profile-badge">
+        <span class="student-avatar-icon animate-bounce">🧑‍🚀</span>
+        <div class="student-meta">
+          <span class="student-name-text" id="headerStudentName">Student Explorer</span>
+          <span class="student-class-badge" id="headerStudentGrade">Senior 7</span>
+        </div>
+      </div>
+      <div class="header-right-meta">
+        <span class="badge badge-primary" id="headerQuizStatus">🚀 Quiz Adventure Active</span>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: Registration Screen -->
+    <section id="registrationScreen" class="screen active animate-pop">
+      <div class="card welcome-card">
+        <!-- Upgraded Animated Explorer Icon -->
+        <div class="welcome-avatar-wrapper">
+          <div class="welcome-avatar animate-pulse-glow">🧑‍🚀⭐</div>
+        </div>
+        <h1>Welcome, Explorer!</h1>
+        <p>Ready to test your knowledge? Enter your name to blast off into today's challenge!</p>
+
+        <form id="registrationForm">
+          <div class="form-group">
+            <label for="studentName" class="form-label">🧑‍🎓 Student Full Name</label>
+            <input type="text" id="studentName" class="form-input" placeholder="e.g. Alex Smith" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="studentGrade" class="form-label">🏫 Grade / Class</label>
+            <select id="studentGrade" class="form-select" required>
+              <option value="Senior 7" selected>Senior 7</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+            <span>Start Quiz Adventure</span> 🚀
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: Quiz Host Shell & Runner -->
+    <section id="quizRunnerScreen" class="screen animate-pop">
+      <div class="card quiz-shell-card">
+        <div class="quiz-shell-topbar">
+          <div class="student-info-badge">
+            <span>👤</span>
+            <span id="runnerStudentInfo">Alex (Grade 3)</span>
+          </div>
+
+          <div class="quiz-counter" id="runnerQuizCounter">
+            Quiz 1 of 1
+          </div>
+        </div>
+
+        <!-- Global Progress Bar -->
+        <div class="progress-container">
+          <div id="runnerProgressBar" class="progress-bar-fill"></div>
+        </div>
+
+        <!-- Dynamic Quiz iFrame -->
+        <div class="iframe-container">
+          <iframe id="quizFrame" class="quiz-iframe" title="Interactive Quiz Area"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: Celebration & Final Results -->
+    <section id="completionScreen" class="screen animate-pop">
+      <div class="card completion-card">
+        <div class="trophy-icon animate-bounce">🏆</div>
+        <h1>Fantastic Job!</h1>
+        <p id="completionStudentName">You completed all quizzes successfully!</p>
+
+        <div class="score-summary-box">
+          <div class="score-big" id="finalScoreDisplay">10 / 10</div>
+          <div style="font-weight: 800; color: var(--accent-green-dark);" id="finalPercentageDisplay">100% Score</div>
+
+          <div class="breakdown-list" id="finalBreakdownList">
+            <!-- Quiz breakdown items inserted dynamically -->
+          </div>
+        </div>
+
+        <div class="completion-actions">
+          <button id="nextStudentBtn" class="btn btn-primary">
+            New Student / Start Over 🔄
+          </button>
+          <a href="admin.html" class="btn btn-outline">
+            View All Results in Admin 📊
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Core Platform Scripts -->
+  <script src="config.js"></script>
+  <script src="quizzes/manifest.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/shell.js"></script>
+</body>
+</html>

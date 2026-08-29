@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset=UTF-8>
+  <meta name=viewport content=width=device-width, initial-scale=1.0>
+  <title>Sample Quiz - Template</title>
+  <link rel=stylesheet href=../../css/main.css>
+  <link rel=stylesheet href=sample-quiz.css>
+</head>
+<body class=sample-quiz-body>
+  <div class=sample-quiz-container animate-pop>
+    <div class=sample-header>
+      <span class=badge badge-primary>Sample Quiz</span>
+      <h2>🌟 Question 1 of 2</h2>
+    </div>
+
+    <div class=question-card>
+      <p class=question-text id=questionText>What is 5 + 3?</p>
+      
+      <div class=options-grid id=optionsContainer>
+        <button class=option-btn data-value=6>6</button>
+        <button class=option-btn data-value=8>8</button>
+        <button class=option-btn data-value=9>9</button>
+        <button class=option-btn data-value=10>10</button>
+      </div>
+    </div>
+
+    <div class=feedback-box id=feedbackBox></div>
+  </div>
+
+  <!-- Include Quiz SDK to communicate with Host Shell -->
+  <script src=../../js/quiz-sdk.js></script>
+  <script src=sample-quiz.js></script>
+</body>
+</html>

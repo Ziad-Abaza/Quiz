@@ -1,0 +1,269 @@
+/* ==========================================================================
+   Shell Layout & Multi-Screen Container
+   ========================================================================== */
+
+.app-wrapper {
+  max-width: 960px;
+  width: 94%;
+  margin: 28px auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 14px 22px;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-standard);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Student-only Top Data Header */
+.student-header {
+  background: #FFFFFF;
+  border: 2px solid var(--module-01-border);
+  border-left: 6px solid var(--brand-accent);
+}
+
+.student-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.student-avatar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--module-01-bg);
+  border: 1px solid var(--module-01-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.student-meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.student-name-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+  line-height: 1.2;
+}
+
+.student-class-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--brand-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  background: var(--canvas-bg);
+  border: 1px solid var(--border-standard);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+}
+
+.admin-link:hover {
+  background: var(--module-01-bg);
+  border-color: var(--module-01-accent);
+  color: var(--module-01-accent);
+}
+
+/* Screens */
+.screen {
+  display: none;
+  width: 100%;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* ==========================================================================
+   Screen 1: Welcome & Registration
+   ========================================================================== */
+
+.welcome-card {
+  text-align: center;
+  max-width: 540px;
+  margin: 20px auto;
+  border-top: 6px solid var(--brand-accent);
+}
+
+.welcome-avatar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--module-01-bg);
+  border: 2px solid var(--module-01-border);
+  margin: 0 auto 16px;
+  box-shadow: 0 0 20px rgba(12, 166, 163, 0.2);
+}
+
+.welcome-avatar {
+  font-size: 3rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+.welcome-card h1 {
+  margin-bottom: 8px;
+}
+
+.welcome-card p {
+  margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   Screen 2: Quiz Host Frame & Progress Header
+   ========================================================================== */
+
+.quiz-shell-card {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 660px;
+  min-height: 600px;
+  border: 2px solid var(--border-standard);
+}
+
+.quiz-shell-topbar {
+  padding: 16px 24px;
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--border-standard);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.student-info-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brand-primary);
+  background: var(--module-02-bg);
+  border: 1px solid var(--module-02-border);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+}
+
+.quiz-counter {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+}
+
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background: var(--border-standard);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--module-01-accent) 0%, var(--module-02-accent) 100%);
+  width: 0%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.iframe-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: var(--canvas-bg);
+}
+
+.quiz-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ==========================================================================
+   Screen 3: Completion & Results
+   ========================================================================== */
+
+.completion-card {
+  text-align: center;
+  max-width: 620px;
+  margin: 20px auto;
+  border-top: 6px solid var(--module-06-accent);
+}
+
+.trophy-icon {
+  font-size: 4.5rem;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.score-summary-box {
+  background: var(--module-01-bg);
+  border: 2px solid var(--module-01-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.score-big {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--brand-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+}
+
+.breakdown-list {
+  text-align: left;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #FFFFFF;
+  border: 1px solid var(--module-01-border);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+}
+
+.completion-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}

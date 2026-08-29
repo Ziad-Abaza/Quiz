@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Kids Quiz Platform</title>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- PASSWORD AUTHENTICATION MODAL -->
+  <div id="authModal" class="modal-overlay">
+    <div class="card modal-card animate-pop">
+      <div class="modal-icon animate-pulse-glow">🛡️✨</div>
+      <h2>Teacher & Admin Portal</h2>
+      <p>Enter the security key to access student scores & analytics.</p>
+
+      <form id="authForm" style="margin-top: 18px;" onsubmit="return false;">
+        <div class="form-group">
+          <input type="password" id="adminPasswordInput" class="form-input" required autofocus>
+          <div id="authError" class="error-msg"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <span>Access Control Center</span> 🚀
+        </button>
+        <a href="index.html" class="btn btn-outline" style="width: 100%; margin-top: 10px;">
+          ← Back to Quizzes
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN ADMIN DASHBOARD CONTENT -->
+  <div class="admin-wrapper" id="adminContent" style="display: none;">
+    <!-- Top Header -->
+    <header class="app-header animate-pop">
+      <div class="brand-logo-container">
+        <div class="brand-logo-badge animate-pulse-glow">
+          <svg class="brand-logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="12" fill="url(#adminLogoGrad)"/>
+            <path d="M20 10V30M10 20H30" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="4" fill="#00A896"/>
+            <defs>
+              <linearGradient id="adminLogoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0E1D4A"/>
+                <stop offset="1" stop-color="#0284C7"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-title">Teacher & Admin Portal</span>
+          <span class="brand-subtitle">Results Control • Senior 7</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a href="index.html" class="admin-link">🚀 Student View</a>
+        <button id="logoutBtn" class="admin-link" style="border: none; cursor: pointer;">Logout</button>
+      </div>
+    </header>
+
+    <!-- KPI Summary Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+          <div class="stat-value" id="statTotalStudents">0</div>
+          <div class="stat-label">Students Completed</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div>
+          <div class="stat-value" id="statAverageScore">0%</div>
+          <div class="stat-label">Average Class Score</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div>
+          <div class="stat-value" id="statTotalQuizzes">0</div>
+          <div class="stat-label">Registered Quizzes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar: Search & Action Buttons -->
+    <div class="card" style="margin-bottom: 24px; padding: 24px;">
+      <div class="toolbar">
+        <input type="text" id="searchInput" class="form-input search-input" placeholder="🔍 Search by student name or grade...">
+        
+        <div class="toolbar-actions">
+          <button id="downloadTxtBtn" class="btn btn-success">
+            📥 Download Unified TXT Report
+          </button>
+          <button id="changePwdBtn" class="btn btn-outline">
+            🔑 Change Password
+          </button>
+          <button id="clearDataBtn" class="btn btn-outline" style="color: var(--accent-coral); border-color: var(--accent-coral);">
+            🗑️ Clear All Records
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student Name</th>
+              <th>Grade / Class</th>
+              <th>Score</th>
+              <th>Performance</th>
+              <th>Completed Time</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="config.js"></script>
+  <script src="quizzes/manifest.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
