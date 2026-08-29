@@ -44,16 +44,16 @@
     }
   }
 
-  function init() {
+  async function init() {
     if (manifest.length === 0) {
       alert("Notice: No quizzes registered in quizzes/manifest.js.");
     }
 
-    // Check if device is locked or there is an active session
-    checkDeviceAndSessionState();
+    // 1. Sync remote reset version first to unlock if Admin triggered reset
+    await checkRemoteDeviceReset();
 
-    // Async check remote reset version from Google Sheets
-    checkRemoteDeviceReset();
+    // 2. Check if device is locked or there is an active session
+    checkDeviceAndSessionState();
 
     // Language switcher toggle
     const langBtn = document.getElementById("langSwitchBtn");
