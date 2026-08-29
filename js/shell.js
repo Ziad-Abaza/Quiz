@@ -52,6 +52,9 @@
     // Check if device is locked or there is an active session
     checkDeviceAndSessionState();
 
+    // Async check remote reset version from Google Sheets
+    checkRemoteDeviceReset();
+
     // Language switcher toggle
     const langBtn = document.getElementById("langSwitchBtn");
     if (langBtn) {
@@ -83,6 +86,21 @@
 
     // Listen for QuizSDK postMessage events
     window.addEventListener("message", handleQuizMessage);
+  }
+
+  async function checkRemoteDeviceReset() {
+    if (window.QuizSheetsApi && window.QuizSheetsApi.isConfigured()) {
+      try {
+        const serverVersion = await window.QuizSheetsApi.fetchResetVersion();
+        const wasReset = storage.syncWithServerResetVersion(serverVersion);
+        if (wasReset) {
+          console.log("Remote device reset applied from Google Sheets.");
+          checkDeviceAndSessionState();
+        }
+      } catch (err) {
+        console.warn("Remote reset check failed:", err);
+      }
+    }
   }
 
   function checkDeviceAndSessionState() {

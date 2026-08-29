@@ -30,6 +30,40 @@
       }
     },
 
+    // --- Remote Reset Version Synchronization ---
+    getLocalResetVersion() {
+      return Number(localStorage.getItem(keys.localResetVersion)) || 1;
+    },
+
+    setLocalResetVersion(version) {
+      localStorage.setItem(keys.localResetVersion, String(version || 1));
+    },
+
+    /**
+     * Checks if server reset version is newer than local. If so, clears device lock and active session.
+     * Preserves historical results if any.
+     * @param {number} serverVersion 
+     * @returns {boolean} true if a reset was applied
+     */
+    syncWithServerResetVersion(serverVersion) {
+      const serverVer = Number(serverVersion) || 1;
+      const localVer = this.getLocalResetVersion();
+
+      if (serverVer > localVer) {
+        console.log(`[StorageManager] Server reset version (${serverVer}) > local (${localVer}). Resetting device for new attempt...`);
+        // 1. Clear current active session
+        this.clearCurrentSession();
+        // 2. Unlock device
+        this.setDeviceLocked(false);
+        // 3. Reset completed student registry so the student can take the exam again
+        localStorage.removeItem(keys.completedStudents);
+        // 4. Update local version to match server
+        this.setLocalResetVersion(serverVer);
+        return true;
+      }
+      return false;
+    },
+
     getCompletedStudents() {
       try {
         const raw = localStorage.getItem(keys.completedStudents);

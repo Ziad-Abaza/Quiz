@@ -128,6 +128,68 @@
     },
 
     /**
+     * Fetches current global device reset version timestamp from Google Sheets.
+     * @returns {Promise<number>}
+     */
+    async fetchResetVersion() {
+      if (!this.isConfigured()) return 1;
+
+      try {
+        const url = new URL(this.getApiUrl());
+        url.searchParams.append("action", "getResetVersion");
+
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          if (res && res.status === "success" && res.resetVersion) {
+            return Number(res.resetVersion) || 1;
+          }
+        }
+        return 1;
+      } catch (err) {
+        console.warn("fetchResetVersion network error:", err);
+        return 1;
+      }
+    },
+
+    /**
+     * Triggers global device reset via Apps Script Web App without deleting historical student records.
+     * @returns {Promise<{ success: boolean, resetVersion?: number, error?: string }>}
+     */
+    async resetAllDevices() {
+      if (!this.isConfigured()) {
+        return { success: true, resetVersion: Date.now() };
+      }
+
+      try {
+        const response = await fetch(this.getApiUrl(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({ action: "resetAllDevices" })
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          return {
+            success: res && res.status === "success",
+            resetVersion: res && res.resetVersion
+          };
+        } else {
+          return { success: false, error: "HTTP_" + response.status };
+        }
+      } catch (err) {
+        console.warn("resetAllDevices network error:", err);
+        return { success: false, error: err.toString() };
+      }
+    },
+
+    /**
      * Deletes all records from centralized Google Sheet.
      * @returns {Promise<{ success: boolean, error?: string }>}
      */

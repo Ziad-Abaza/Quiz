@@ -38,6 +38,14 @@ function doGet(e) {
     var action = (e && e.parameter && e.parameter.action) || "getAll";
     var sheet = getOrCreateSheet();
 
+    if (action === "getResetVersion") {
+      var version = getGlobalResetVersion();
+      return createJsonResponse({
+        status: "success",
+        resetVersion: version
+      });
+    }
+
     if (action === "checkStudent") {
       var studentName = String((e.parameter && e.parameter.name) || "").trim().toLowerCase();
       var studentGrade = String((e.parameter && e.parameter.grade) || "").trim().toLowerCase();
@@ -46,7 +54,8 @@ function doGet(e) {
       var isCompleted = checkStudentCompleted(sheet, studentName, studentGrade, studentId);
       return createJsonResponse({
         status: "success",
-        isCompleted: isCompleted
+        isCompleted: isCompleted,
+        resetVersion: getGlobalResetVersion()
       });
     }
 
@@ -55,7 +64,17 @@ function doGet(e) {
       return createJsonResponse({
         status: "success",
         count: results.length,
-        data: results
+        data: results,
+        resetVersion: getGlobalResetVersion()
+      });
+    }
+
+    if (action === "resetAllDevices") {
+      var newVersion = triggerGlobalDeviceReset();
+      return createJsonResponse({
+        status: "success",
+        message: "Global reset triggered successfully. All student devices will unlock.",
+        resetVersion: newVersion
       });
     }
 
@@ -96,6 +115,15 @@ function doPost(e) {
     var sheet = getOrCreateSheet();
     var action = payload.action || (e && e.parameter && e.parameter.action);
 
+    if (action === "resetAllDevices") {
+      var newVersion = triggerGlobalDeviceReset();
+      return createJsonResponse({
+        status: "success",
+        message: "Global reset triggered successfully. All student devices will unlock.",
+        resetVersion: newVersion
+      });
+    }
+
     if (action === "clearAll") {
       var clearedCount = clearAllSheetRecords(sheet);
       return createJsonResponse({
@@ -110,7 +138,8 @@ function doPost(e) {
     return createJsonResponse({
       status: "success",
       message: "Result successfully recorded in Google Sheets",
-      data: result
+      data: result,
+      resetVersion: getGlobalResetVersion()
     });
   } catch (error) {
     return createJsonResponse({
@@ -118,6 +147,73 @@ function doPost(e) {
       message: error.toString()
     });
   }
+}
+
+/**
+ * Global Remote Reset Version Manager
+ * Stores the current reset timestamp in a dedicated settings sheet or ScriptProperties.
+ */
+var SETTINGS_SHEET_NAME = "App Settings";
+
+function getGlobalResetVersion() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var settingsSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
+    if (!settingsSheet) {
+      settingsSheet = ss.insertSheet(SETTINGS_SHEET_NAME);
+      settingsSheet.appendRow(["Key", "Value", "Updated At"]);
+      settingsSheet.appendRow(["RESET_VERSION", 1, new Date().toISOString()]);
+      settingsSheet.getRange(1, 1, 1, 3).setFontWeight("bold").setBackground("#334155").setFontColor("#FFFFFF");
+      return 1;
+    }
+
+    var data = settingsSheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === "RESET_VERSION") {
+        return Number(data[i][1]) || 1;
+      }
+    }
+
+    // Default if key row not found
+    settingsSheet.appendRow(["RESET_VERSION", 1, new Date().toISOString()]);
+    return 1;
+  } catch (err) {
+    var props = PropertiesService.getScriptProperties();
+    var ver = props.getProperty("RESET_VERSION");
+    return ver ? Number(ver) : 1;
+  }
+}
+
+function triggerGlobalDeviceReset() {
+  var newVersion = Date.now();
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var settingsSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
+    if (!settingsSheet) {
+      settingsSheet = ss.insertSheet(SETTINGS_SHEET_NAME);
+      settingsSheet.appendRow(["Key", "Value", "Updated At"]);
+      settingsSheet.appendRow(["RESET_VERSION", newVersion, new Date().toISOString()]);
+      settingsSheet.getRange(1, 1, 1, 3).setFontWeight("bold").setBackground("#334155").setFontColor("#FFFFFF");
+    } else {
+      var data = settingsSheet.getDataRange().getValues();
+      var found = false;
+      for (var i = 1; i < data.length; i++) {
+        if (String(data[i][0]) === "RESET_VERSION") {
+          settingsSheet.getRange(i + 1, 2).setValue(newVersion);
+          settingsSheet.getRange(i + 1, 3).setValue(new Date().toISOString());
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        settingsSheet.appendRow(["RESET_VERSION", newVersion, new Date().toISOString()]);
+      }
+    }
+  } catch (err) {
+    var props = PropertiesService.getScriptProperties();
+    props.setProperty("RESET_VERSION", String(newVersion));
+  }
+  return newVersion;
 }
 
 /**
@@ -218,11 +314,22 @@ function checkStudentCompleted(sheet, studentName, studentGrade, studentId) {
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return false;
 
+  var currentResetVersion = getGlobalResetVersion();
+
   for (var i = 1; i < data.length; i++) {
     var rowSessionId = String(data[i][0] || "").trim();
     var rowStudentId = String(data[i][1] || "").trim();
     var rowName = String(data[i][2] || "").trim().toLowerCase();
     var rowGrade = String(data[i][3] || "").trim().toLowerCase();
+    var rowCompletedAt = data[i][11];
+
+    // If a global reset was triggered, only submissions created AFTER the reset timestamp count as completed attempts
+    if (currentResetVersion > 1) {
+      var rowTime = rowCompletedAt ? new Date(rowCompletedAt).getTime() : 0;
+      if (rowTime > 0 && rowTime < currentResetVersion) {
+        continue; // Submission was from a previous reset epoch, allow new attempt
+      }
+    }
 
     if (studentId && (rowStudentId === studentId || rowSessionId === studentId)) {
       return true;

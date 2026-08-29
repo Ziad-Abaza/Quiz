@@ -18,5 +18,6 @@ window.APP_CONFIG = {
     deviceLocked: "quiz_device_locked_state",
     completedStudents: "quiz_completed_students_registry",
     pendingSyncQueue: "quiz_pending_sheets_queue",
+    localResetVersion: "quiz_local_reset_version",
   },
 };
