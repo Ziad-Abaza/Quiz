@@ -5,10 +5,10 @@
  */
 window.QUIZ_MANIFEST = [
   {
-    id: "quiz-math-basics",
-    title: "Math Wonders: Star Numbers",
-    description: "Addition and fun counting challenges",
-    path: "quizzes/template/sample-quiz.html",
-    maxScore: 10
+    id: "quiz-arduino-hardware",
+    title: "مهمة اليوم: مكونات لوحة أردوينو (Arduino Uno)",
+    description: "التعرف على المكونات التسعة للوحة أردوينو أونو",
+    path: "quizzes/arduino/index.html",
+    maxScore: 9
   }
 ];

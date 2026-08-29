@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مهمة اليوم: مكونات لوحة أردوينو (Arduino Uno)</title>
+  <link rel="stylesheet" href="arduino-quiz.css">
+</head>
+<body>
+  <div class="quiz-container animate-pop">
+    <!-- Header Section -->
+    <header class="mission-header">
+      <div class="mission-badge animate-pulse-glow">
+        <span>مهمة اليوم</span>
+        <span>🔍</span>
+      </div>
+      <p class="mission-instruction">
+        انظر إلى لوحة Arduino جيدًا، ثم اكتب اسم الجزء الذي يشير إليه كل سهم. حاول بنفسك وتعلّم! ✨
+      </p>
+    </header>
+
+    <!-- Center Arduino Board Display (Clean image without overlay badges) -->
+    <div class="board-wrapper" id="boardWrapper">
+      <img src="../../assets/images/ardino_components.png" alt="Arduino Uno Board Components" class="board-img">
+    </div>
+
+    <!-- Sequential Input Cards 1 to 9 Grid -->
+    <div class="cards-grid-sequential" id="cardsContainer"></div>
+
+    <!-- Action Buttons & Live Feedback -->
+    <div class="quiz-actions">
+      <button id="checkBtn" class="btn-action btn-check">
+        <span>تحقق من إجاباتي</span> 🚀
+      </button>
+      <button id="resetBtn" class="btn-action btn-reset">
+        <span>إعادة المحاولة</span> 🔄
+      </button>
+    </div>
+
+    <div id="feedbackMsg" style="text-align: center; min-height: 28px; margin-top: 8px;"></div>
+  </div>
+
+  <!-- Quiz Platform SDK Integration -->
+  <script src="../../js/quiz-sdk.js"></script>
+  <script src="arduino-quiz.js"></script>
+</body>
+</html>
