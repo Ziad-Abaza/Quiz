@@ -360,39 +360,81 @@
     if (resetBtn) resetBtn.addEventListener("click", resetQuiz);
   }
 
+  // State
+  let isSubmitted = false;
+
+  function matchAnswer(userVal, allowedAnswers) {
+    if (!userVal || userVal.length === 0) return false;
+    const normUser = normalizeArabic(userVal);
+    if (normUser.length === 0) return false;
+
+    return allowedAnswers.some(ans => {
+      const normTarget = normalizeArabic(ans);
+      if (normTarget === normUser) return true;
+      if (normTarget.length >= 3 && normUser.includes(normTarget)) return true;
+      if (normUser.length >= 3 && normTarget.includes(normUser)) return true;
+      return false;
+    });
+  }
+
   function checkAnswers() {
-    let score = 0;
+    if (isSubmitted) return;
+
+    const lang = getLang();
+    const texts = i18nTexts[lang];
     const total = components.length;
 
+    // Check if at least one question has an answer or if user clicked with completely empty inputs
+    let anyAnswered = false;
+    components.forEach(comp => {
+      const input = document.getElementById(`input-${comp.id}`);
+      if (input && input.value.trim().length > 0) {
+        anyAnswered = true;
+      }
+    });
+
+    if (!anyAnswered) {
+      const emptyAlert = lang === "ar" ? 
+        "يرجى كتابة إجابة واحدة على الأقل قبل التحقق!" : 
+        "Please write at least one answer before checking!";
+      alert(emptyAlert);
+      return;
+    }
+
+    let score = 0;
     components.forEach(comp => {
       const input = document.getElementById(`input-${comp.id}`);
       const card = document.getElementById(`card-${comp.id}`);
       const status = document.getElementById(`status-${comp.id}`);
-      const val = normalizeArabic(input.value);
+      const rawVal = input ? input.value : "";
+      const val = normalizeArabic(rawVal);
 
-      card.classList.remove("correct", "wrong");
+      if (card) card.classList.remove("correct", "wrong");
 
-      const isArabicCorrect = comp.arabicAnswers.some(ans => {
-        const normAns = normalizeArabic(ans);
-        return normAns === val || val.includes(normAns) || normAns.includes(val);
-      });
-      const isEnglishCorrect = comp.englishAnswers.some(ans => {
-        const normAns = normalizeArabic(ans);
-        return normAns === val || val.includes(normAns) || normAns.includes(val);
-      });
+      const isArabicCorrect = matchAnswer(val, comp.arabicAnswers);
+      const isEnglishCorrect = matchAnswer(val, comp.englishAnswers);
 
-      if (val.length > 1 && (isArabicCorrect || isEnglishCorrect)) {
-        card.classList.add("correct");
-        status.textContent = "✅";
+      if (val.length > 0 && (isArabicCorrect || isEnglishCorrect)) {
+        if (card) card.classList.add("correct");
+        if (status) status.textContent = "✅";
         score++;
       } else {
-        card.classList.add("wrong");
-        status.textContent = "❌";
+        if (card) card.classList.add("wrong");
+        if (status) status.textContent = "❌";
       }
+
+      // Disable inputs upon submission
+      if (input) input.disabled = true;
     });
 
-    const lang = getLang();
-    const texts = i18nTexts[lang];
+    // Mark as submitted
+    isSubmitted = true;
+    if (checkBtn) {
+      checkBtn.disabled = true;
+      checkBtn.style.opacity = "0.5";
+      checkBtn.style.cursor = "not-allowed";
+    }
+
     if (score === total) {
       const msg = texts.perfectScore.replace("{score}", score).replace("{total}", total);
       feedbackMsg.innerHTML = `<span style="color: #16A34A; font-weight: 900; font-size: 1.2rem;">${msg}</span>`;
@@ -401,6 +443,7 @@
       feedbackMsg.innerHTML = `<span style="color: #EA580C; font-weight: 800; font-size: 1.1rem;">${msg}</span>`;
     }
 
+    // Submit score exactly once to QuizSDK
     if (window.QuizSDK) {
       window.QuizSDK.submitScore({
         score: score,
@@ -410,14 +453,23 @@
   }
 
   function resetQuiz() {
+    isSubmitted = false;
     components.forEach(comp => {
       const input = document.getElementById(`input-${comp.id}`);
       const card = document.getElementById(`card-${comp.id}`);
       const status = document.getElementById(`status-${comp.id}`);
-      if (input) input.value = "";
+      if (input) {
+        input.value = "";
+        input.disabled = false;
+      }
       if (card) card.classList.remove("correct", "wrong", "highlighted");
       if (status) status.textContent = "";
     });
+    if (checkBtn) {
+      checkBtn.disabled = false;
+      checkBtn.style.opacity = "1";
+      checkBtn.style.cursor = "pointer";
+    }
     feedbackMsg.innerHTML = "";
   }
 

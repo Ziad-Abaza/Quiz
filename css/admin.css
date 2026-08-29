@@ -46,7 +46,112 @@
   min-height: 20px;
 }
 
-/* Admin Header & Quick Stats */
+/* Admin Header Card */
+.admin-header-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 2px solid var(--border-standard);
+  box-shadow: 0 8px 24px rgba(14, 29, 74, 0.06);
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+[dir="rtl"] .admin-header-card {
+  border-right: 6px solid #0284C7;
+}
+
+[dir="ltr"] .admin-header-card {
+  border-left: 6px solid #0284C7;
+}
+
+.admin-avatar-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(14, 29, 74, 0.08) 100%);
+  border: 2px solid rgba(2, 132, 199, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+  flex-shrink: 0;
+}
+
+.admin-avatar-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.admin-role-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: #0284C7;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-nav-pill {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid transparent;
+}
+
+.admin-nav-pill:active {
+  transform: scale(0.97);
+}
+
+.admin-nav-pill.student-pill {
+  background: rgba(12, 166, 163, 0.1);
+  color: var(--brand-accent);
+  border-color: rgba(12, 166, 163, 0.25);
+}
+
+.admin-nav-pill.student-pill:hover {
+  background: var(--brand-accent);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(12, 166, 163, 0.25);
+}
+
+.admin-nav-pill.logout-pill {
+  background: #F8FAFC;
+  color: #64748B;
+  border-color: var(--border-standard);
+}
+
+.admin-nav-pill.logout-pill:hover {
+  background: rgba(225, 29, 72, 0.08);
+  color: #E11D48;
+  border-color: rgba(225, 29, 72, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
+}
+
+/* Quick Stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

@@ -17,5 +17,12 @@ window.QUIZ_MANIFEST = [
     description: "15 سؤال اختيار من متعدد لاختبار المفاهيم الأساسية للأردوينو",
     path: "quizzes/arduino-mcq/index.html",
     maxScore: 15
+  },
+  {
+    id: "quiz-arduino-sensors-mcq",
+    title: "اختبار حساسات ومكونات الأردوينو (Arduino Sensors Quiz)",
+    description: "10 أسئلة اختيار من متعدد لاختبار حساسات ومكونات الأردوينو وتطبيقاتها",
+    path: "quizzes/arduino-sensors-mcq/index.html",
+    maxScore: 10
   }
 ];

@@ -74,25 +74,39 @@
       </div>
     </section>
 
-    <!-- TEACHER UNLOCK DEVICE MODAL -->
+    <!-- ENHANCED TEACHER UNLOCK DEVICE POPUP MODAL -->
     <div id="unlockDeviceModal" class="modal-overlay" style="display: none;">
       <div class="card modal-card animate-pop">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-          <button type="button" id="closeUnlockModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748B;">✕</button>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">
+          <button type="button" id="closeUnlockModalBtn" class="modal-close-btn" title="Close">✕</button>
         </div>
-        <div class="modal-icon" style="text-align: center; font-size: 2.5rem; margin-bottom: 12px;">🛡️</div>
-        <h2 style="text-align: center; color: var(--brand-navy); font-weight: 800; font-size: 1.3rem; margin-bottom: 8px;" data-i18n="registration.unlockPromptTitle">
-          Unlock Device for Next Student 🔑
+        
+        <div class="modal-badge-icon">
+          <span>🔑</span>
+        </div>
+        
+        <h2 class="modal-title" data-i18n="registration.unlockPromptTitle">
+          إلغاء قفل الجهاز لبدء طالب جديد 🔑
         </h2>
-        <form id="unlockDeviceForm" style="margin-top: 16px;">
-          <div class="form-group">
-            <input type="password" id="unlockAdminPassword" class="form-input" data-i18n-placeholder="registration.unlockPasswordPlaceholder" placeholder="Teacher / Admin Password..." required autocomplete="off">
+        
+        <p class="modal-subtitle" data-i18n="admin.loginSubtitle">
+          أدخل كلمة مرور المعلم / الإدارة لإلغاء قفل الجهاز والسماح لطالب جديد ببدء الاختبار.
+        </p>
+
+        <form id="unlockDeviceForm">
+          <div class="unlock-input-wrapper">
+            <span class="unlock-input-icon">🔒</span>
+            <input type="password" id="unlockAdminPassword" class="unlock-input-field" data-i18n-placeholder="registration.unlockPasswordPlaceholder" placeholder="كلمة مرور المعلم / الإدارة..." required autocomplete="off">
           </div>
-          <div id="unlockErrorMsg" class="form-error-msg" style="display: none; color: #E11D48; font-weight: 800; text-align: center; margin-bottom: 12px;" data-i18n="registration.unlockError">
-            Incorrect teacher password.
+
+          <div id="unlockErrorMsg" class="unlock-error-banner" style="display: none;">
+            <span>⚠️</span>
+            <span data-i18n="registration.unlockError">كلمة مرور المعلم غير صحيحة.</span>
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%;">
-            <span data-i18n="registration.unlockBtn">Unlock & Start 🚀</span>
+
+          <button type="submit" class="btn-unlock-submit">
+            <span>🚀</span>
+            <span data-i18n="registration.unlockBtn">إلغاء القفل والبدء 🚀</span>
           </button>
         </form>
       </div>
