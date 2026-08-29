@@ -125,6 +125,36 @@
         console.warn("fetchAllResults failed (network error):", err);
         return null;
       }
+    },
+
+    /**
+     * Deletes all records from centralized Google Sheet.
+     * @returns {Promise<{ success: boolean, error?: string }>}
+     */
+    async clearAllRecords() {
+      if (!this.isConfigured()) {
+        return { success: true }; // Local only
+      }
+
+      try {
+        const response = await fetch(this.getApiUrl(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({ action: "clearAll" })
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          return { success: res && res.status === "success" };
+        } else {
+          return { success: false, error: "HTTP_" + response.status };
+        }
+      } catch (err) {
+        console.warn("clearAllRecords network error:", err);
+        return { success: false, error: err.toString() };
+      }
     }
   };
 

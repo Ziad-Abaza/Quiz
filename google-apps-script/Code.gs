@@ -58,6 +58,15 @@ function doGet(e) {
       });
     }
 
+    if (action === "clearAll") {
+      var clearedCount = clearAllSheetRecords(sheet);
+      return createJsonResponse({
+        status: "success",
+        message: "All student records deleted from Google Sheets",
+        deletedCount: clearedCount
+      });
+    }
+
     return createJsonResponse({
       status: "success",
       message: "Kids Quiz Platform Google Sheets API is live!"
@@ -84,6 +93,17 @@ function doPost(e) {
     }
 
     var sheet = getOrCreateSheet();
+    var action = payload.action || (e && e.parameter && e.parameter.action);
+
+    if (action === "clearAll") {
+      var clearedCount = clearAllSheetRecords(sheet);
+      return createJsonResponse({
+        status: "success",
+        message: "All student records deleted from Google Sheets",
+        deletedCount: clearedCount
+      });
+    }
+
     var result = recordStudentSubmission(sheet, payload);
 
     return createJsonResponse({
@@ -97,6 +117,19 @@ function doPost(e) {
       message: error.toString()
     });
   }
+}
+
+/**
+ * Deletes all student data rows from the Google Sheet while preserving headers & formatting.
+ */
+function clearAllSheetRecords(sheet) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    var numRowsToDelete = lastRow - 1;
+    sheet.deleteRows(2, numRowsToDelete);
+    return numRowsToDelete;
+  }
+  return 0;
 }
 
 function recordStudentSubmission(sheet, payload) {

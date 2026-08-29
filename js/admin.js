@@ -201,13 +201,58 @@
     exporter.downloadTxtFile(filename, reportContent);
   }
 
-  function handleClearData() {
+  async function handleClearData() {
+    // 1. Strict Admin Authentication Guard
+    if (!isAuthenticated) {
+      alert("Unauthorized action. Please log in as Admin.");
+      return;
+    }
+
     const confirmMsg = window.I18n ? 
       window.I18n.t("admin.clearConfirm") : 
-      "Are you sure you want to delete all student records? This action cannot be undone.";
-    if (confirm(confirmMsg)) {
+      "Are you sure you want to delete all student records from Google Sheets and this system? This action cannot be undone.";
+
+    if (!confirm(confirmMsg)) {
+      return;
+    }
+
+    if (clearDataBtn) {
+      clearDataBtn.disabled = true;
+      clearDataBtn.textContent = window.I18n ? window.I18n.t("common.loading") : "Deleting...";
+    }
+
+    try {
+      // 2. Delete from centralized Google Sheets
+      if (window.QuizSheetsApi && window.QuizSheetsApi.isConfigured()) {
+        const res = await window.QuizSheetsApi.clearAllRecords();
+        if (!res || !res.success) {
+          throw new Error(res && res.error ? res.error : "Failed to delete records from Google Sheets server.");
+        }
+      }
+
+      // 3. Clear Local Storage records, anti-retake completed registry, and unlock device
       storage.clearAllResults();
-      renderDashboard();
+      cachedResults = [];
+
+      // 4. Re-render fresh empty state
+      await renderDashboard();
+
+      const successAlert = window.I18n && window.I18n.getLang() === "ar" ?
+        "تم مسح كافة سجلات الطلاب من Google Sheets والنظام المحلي بنجاح! 🗑️" :
+        "All student records have been permanently cleared from Google Sheets and Local Storage! 🗑️";
+      alert(successAlert);
+
+    } catch (err) {
+      console.error("handleClearData error:", err);
+      const errMsg = (window.I18n && window.I18n.getLang() === "ar") ?
+        ("❌ فشل حذف السجلات من Google Sheets: " + err.message) :
+        ("❌ Failed to clear records from Google Sheets: " + err.message);
+      alert(errMsg);
+    } finally {
+      if (clearDataBtn) {
+        clearDataBtn.disabled = false;
+        clearDataBtn.textContent = window.I18n ? window.I18n.t("admin.clearBtn") : "Clear All Records 🗑️";
+      }
     }
   }
 
