@@ -68,8 +68,38 @@
     getLanguage() {
       if (window.I18n) return window.I18n.getLang();
       return localStorage.getItem("quiz_platform_lang") || "ar";
+    },
+
+    /**
+     * Validates that the quiz is running within an active authorized shell session.
+     * If opened directly outside an iframe with no session, redirects or blocks access.
+     */
+    enforceActiveSession() {
+      const isEmbedded = window.parent && window.parent !== window;
+      if (!isEmbedded) {
+        try {
+          const rawSession = localStorage.getItem("quiz_current_session");
+          const session = rawSession ? JSON.parse(rawSession) : null;
+          const isLocked = localStorage.getItem("quiz_device_locked_state") === "true";
+          if (!session || session.completedAt || isLocked) {
+            document.body.innerHTML = `
+              <div style="font-family: 'Cairo', system-ui, sans-serif; text-align: center; padding: 40px 20px; color: #0E1D4A;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">🔒</div>
+                <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 12px;">غير مسموح بالوصول المباشر لهذا الاختبار</h2>
+                <p style="color: #64748B; font-weight: 600; margin-bottom: 24px;">يرجى تسجيل الدخول وبدء الاختبار من المنصة الرئيسية.</p>
+                <a href="../../index.html" style="display: inline-block; background: #009688; color: #fff; padding: 10px 24px; border-radius: 9999px; text-decoration: none; font-weight: 800;">الذهاب للمنصة الرئيسية 🚀</a>
+              </div>
+            `;
+          }
+        } catch (e) {
+          console.warn("Session check error:", e);
+        }
+      }
     }
   };
 
   window.QuizSDK = QuizSDK;
+  window.addEventListener("DOMContentLoaded", () => {
+    QuizSDK.enforceActiveSession();
+  });
 })(window);

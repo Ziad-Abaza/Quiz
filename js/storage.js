@@ -1,6 +1,6 @@
 /**
  * Storage Manager for Kids Quiz Platform
- * Handles LocalStorage persistence for sessions, student results, and admin credentials.
+ * Handles LocalStorage persistence for sessions, student results, device locking, and anti-retake protection.
  */
 (function(window) {
   const config = window.APP_CONFIG || {
@@ -8,22 +8,104 @@
     storageKeys: {
       currentSession: "quiz_current_session",
       allResults: "quiz_all_results",
-      adminPassword: "quiz_admin_password"
+      adminPassword: "quiz_admin_password",
+      deviceLocked: "quiz_device_locked_state",
+      completedStudents: "quiz_completed_students_registry"
     }
   };
 
   const keys = config.storageKeys;
 
   const StorageManager = {
+    // --- Device Lock & Completed Registry ---
+    isDeviceLocked() {
+      return localStorage.getItem(keys.deviceLocked) === "true";
+    },
+
+    setDeviceLocked(locked) {
+      if (locked) {
+        localStorage.setItem(keys.deviceLocked, "true");
+      } else {
+        localStorage.removeItem(keys.deviceLocked);
+      }
+    },
+
+    getCompletedStudents() {
+      try {
+        const raw = localStorage.getItem(keys.completedStudents);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error("Failed to parse completed students:", e);
+        return [];
+      }
+    },
+
+    isStudentCompleted(name, grade) {
+      const normalizedName = String(name || "").trim().toLowerCase();
+      const normalizedGrade = String(grade || "").trim().toLowerCase();
+      const list = this.getCompletedStudents();
+      return list.some(item => 
+        item.normalizedName === normalizedName && 
+        item.normalizedGrade === normalizedGrade
+      );
+    },
+
+    registerCompletedStudent(session) {
+      const list = this.getCompletedStudents();
+      const record = {
+        id: session.id,
+        name: session.name,
+        grade: session.grade,
+        normalizedName: String(session.name || "").trim().toLowerCase(),
+        normalizedGrade: String(session.grade || "").trim().toLowerCase(),
+        completedAt: session.completedAt || new Date().toISOString(),
+        totalScore: session.totalScore,
+        totalMaxScore: session.totalMaxScore
+      };
+
+      if (!list.some(item => item.id === record.id)) {
+        list.push(record);
+        localStorage.setItem(keys.completedStudents, JSON.stringify(list));
+      }
+      // Lock device automatically
+      this.setDeviceLocked(true);
+    },
+
+    unlockDeviceWithPassword(enteredPassword) {
+      if (this.verifyAdminPassword(enteredPassword)) {
+        this.setDeviceLocked(false);
+        this.clearCurrentSession();
+        return true;
+      }
+      return false;
+    },
+
     // --- Current Student Session ---
     startSession(name, grade) {
+      // 1. Device lock check
+      if (this.isDeviceLocked()) {
+        throw new Error("DEVICE_LOCKED");
+      }
+
+      // 2. Anti-retake duplicate student check
+      if (this.isStudentCompleted(name, grade)) {
+        throw new Error("STUDENT_ALREADY_COMPLETED");
+      }
+
+      // 3. Prevent overwriting active incomplete session
+      const existing = this.getCurrentSession();
+      if (existing && !existing.completedAt) {
+        return existing;
+      }
+
       const session = {
         id: "stu_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
         name: name.trim(),
         grade: grade.trim(),
         startedAt: new Date().toISOString(),
         currentQuizIndex: 0,
-        scores: {} // { [quizId]: { score: number, maxScore: number, completedAt: string } }
+        scores: {}, // { [quizId]: { score: number, maxScore: number, completedAt: string } }
+        completedAt: null
       };
       localStorage.setItem(keys.currentSession, JSON.stringify(session));
       return session;
@@ -42,20 +124,28 @@
     saveQuizScore(quizId, score, maxScore) {
       const session = this.getCurrentSession();
       if (!session) return null;
+      if (session.completedAt) return session; // Locked session
 
-      session.scores[quizId] = {
-        score: Number(score),
-        maxScore: Number(maxScore),
-        completedAt: new Date().toISOString()
-      };
-      localStorage.setItem(keys.currentSession, JSON.stringify(session));
+      // Validate inputs
+      const safeScore = Math.max(0, Math.min(Number(score) || 0, Number(maxScore) || 100));
+      const safeMaxScore = Math.max(1, Number(maxScore) || 1);
+
+      // Prevent duplicate submission overwriting if already completed
+      if (!session.scores[quizId]) {
+        session.scores[quizId] = {
+          score: safeScore,
+          maxScore: safeMaxScore,
+          completedAt: new Date().toISOString()
+        };
+        localStorage.setItem(keys.currentSession, JSON.stringify(session));
+      }
       return session;
     },
 
     updateQuizIndex(index) {
       const session = this.getCurrentSession();
-      if (!session) return null;
-      session.currentQuizIndex = index;
+      if (!session || session.completedAt) return null;
+      session.currentQuizIndex = Math.max(0, Number(index) || 0);
       localStorage.setItem(keys.currentSession, JSON.stringify(session));
       return session;
     },
@@ -63,25 +153,34 @@
     completeSession() {
       const session = this.getCurrentSession();
       if (!session) return null;
+      if (session.completedAt) return session; // Already completed
 
       session.completedAt = new Date().toISOString();
 
-      // Calculate total score
+      // Calculate validated total score
       let totalScore = 0;
       let totalMaxScore = 0;
       Object.values(session.scores).forEach(item => {
-        totalScore += item.score || 0;
-        totalMaxScore += item.maxScore || 0;
+        totalScore += Number(item.score) || 0;
+        totalMaxScore += Number(item.maxScore) || 0;
       });
 
       session.totalScore = totalScore;
       session.totalMaxScore = totalMaxScore;
       session.percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
 
-      // Add to all results
+      // Update current session in storage
+      localStorage.setItem(keys.currentSession, JSON.stringify(session));
+
+      // Append to all results avoiding duplicates by student ID
       const allResults = this.getAllResults();
-      allResults.push(session);
-      localStorage.setItem(keys.allResults, JSON.stringify(allResults));
+      if (!allResults.some(item => item.id === session.id)) {
+        allResults.push(session);
+        localStorage.setItem(keys.allResults, JSON.stringify(allResults));
+      }
+
+      // Register student permanently in completed registry & lock device
+      this.registerCompletedStudent(session);
 
       return session;
     },
@@ -103,6 +202,8 @@
 
     clearAllResults() {
       localStorage.setItem(keys.allResults, JSON.stringify([]));
+      localStorage.setItem(keys.completedStudents, JSON.stringify([]));
+      localStorage.removeItem(keys.deviceLocked);
     },
 
     // --- Admin Authentication ---

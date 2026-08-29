@@ -43,6 +43,10 @@
         <h1 data-i18n="registration.welcomeTitle">Welcome, Explorer! 🧑‍🚀</h1>
         <p data-i18n="registration.welcomeSubtitle">Ready to test your tech knowledge? Enter your name to blast off into today's challenge!</p>
 
+        <!-- Inline Error Alert for Anti-Retake & Device Lock -->
+        <div id="regAlertBox" class="alert-box" style="display: none; margin: 16px 0; padding: 14px; border-radius: 12px; background: rgba(225, 29, 72, 0.08); border: 2px solid #E11D48; color: #9F1239; font-weight: 800; font-size: 0.95rem; text-align: center;"></div>
+
+        <!-- Normal Registration Form -->
         <form id="registrationForm">
           <div class="form-group">
             <label for="studentName" class="form-label" data-i18n="registration.nameLabel">🧑‍🎓 Student Full Name</label>
@@ -56,12 +60,43 @@
             </select>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+          <button type="submit" id="startExamBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
             <span data-i18n="registration.startBtn">Start Quiz Adventure 🚀</span>
           </button>
         </form>
+
+        <!-- Device Locked Teacher Unlock Action -->
+        <div id="deviceLockedActions" style="display: none; margin-top: 18px; text-align: center;">
+          <button type="button" id="openTeacherUnlockBtn" class="btn btn-secondary" style="width: 100%;">
+            <span>🔑</span> <span data-i18n="registration.unlockPromptTitle">Unlock Device for Next Student 🔑</span>
+          </button>
+        </div>
       </div>
     </section>
+
+    <!-- TEACHER UNLOCK DEVICE MODAL -->
+    <div id="unlockDeviceModal" class="modal-overlay" style="display: none;">
+      <div class="card modal-card animate-pop">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <button type="button" id="closeUnlockModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748B;">✕</button>
+        </div>
+        <div class="modal-icon" style="text-align: center; font-size: 2.5rem; margin-bottom: 12px;">🛡️</div>
+        <h2 style="text-align: center; color: var(--brand-navy); font-weight: 800; font-size: 1.3rem; margin-bottom: 8px;" data-i18n="registration.unlockPromptTitle">
+          Unlock Device for Next Student 🔑
+        </h2>
+        <form id="unlockDeviceForm" style="margin-top: 16px;">
+          <div class="form-group">
+            <input type="password" id="unlockAdminPassword" class="form-input" data-i18n-placeholder="registration.unlockPasswordPlaceholder" placeholder="Teacher / Admin Password..." required autocomplete="off">
+          </div>
+          <div id="unlockErrorMsg" class="form-error-msg" style="display: none; color: #E11D48; font-weight: 800; text-align: center; margin-bottom: 12px;" data-i18n="registration.unlockError">
+            Incorrect teacher password.
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            <span data-i18n="registration.unlockBtn">Unlock & Start 🚀</span>
+          </button>
+        </form>
+      </div>
+    </div>
 
     <!-- SCREEN 2: Quiz Host Shell & Runner -->
     <section id="quizRunnerScreen" class="screen animate-pop">

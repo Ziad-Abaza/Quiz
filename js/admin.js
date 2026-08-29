@@ -21,6 +21,7 @@
   const searchInput = document.getElementById("searchInput");
   const resultsTableBody = document.getElementById("resultsTableBody");
   const downloadTxtBtn = document.getElementById("downloadTxtBtn");
+  const unlockDeviceAdminBtn = document.getElementById("unlockDeviceAdminBtn");
   const changePwdBtn = document.getElementById("changePwdBtn");
   const clearDataBtn = document.getElementById("clearDataBtn");
 
@@ -52,7 +53,14 @@
 
     searchInput.addEventListener("input", handleSearch);
     downloadTxtBtn.addEventListener("click", handleDownloadTxt);
+    if (unlockDeviceAdminBtn) unlockDeviceAdminBtn.addEventListener("click", handleResetDevice);
     if (clearDataBtn) clearDataBtn.addEventListener("click", handleClearData);
+  }
+
+  function handleResetDevice() {
+    storage.setDeviceLocked(false);
+    storage.clearCurrentSession();
+    alert(window.I18n ? window.I18n.t("admin.deviceUnlockedAlert") : "Device has been unlocked for the next student! ✅");
   }
 
   function handleLogin(e) {

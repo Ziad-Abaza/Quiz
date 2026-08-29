@@ -31,7 +31,13 @@
         "namePlaceholder": "مثال: أحمد محمد",
         "gradeLabel": "🏫 الصف / الفصل",
         "gradeValue": "Senior 7",
-        "startBtn": "ابدأ مغامرة الاختبار 🚀"
+        "startBtn": "ابدأ مغامرة الاختبار 🚀",
+        "errorStudentCompleted": "⚠️ هذا الطالب قد أتم الاختبار مسبقًا على هذا النظام ولا يُسمح بإعادة التقديم.",
+        "errorDeviceLocked": "🔒 تم قفل هذا الجهاز بعد إنهاء الاختبار السابق. يُرجى مراجعة المعلم لفتح الجهاز لطالب جديد.",
+        "unlockPromptTitle": "إلغاء قفل الجهاز لبدء طالب جديد 🔑",
+        "unlockPasswordPlaceholder": "كلمة مرور المعلم / الإدارة...",
+        "unlockBtn": "إلغاء القفل والبدء 🚀",
+        "unlockError": "كلمة مرور المعلم غير صحيحة."
       },
       "runner": {
         "quizCounter": "الاختبار {current} من {total}",
@@ -58,6 +64,8 @@
         "statTotalQuizzes": "الاختبارات النشطة",
         "searchPlaceholder": "🔍 بحث باسم الطالب أو الصف...",
         "exportBtn": "تحميل تقرير TXT الشامل 📥",
+        "resetDeviceBtn": "إلغاء قفل الجهاز والسماح لطالب جديد 🔓",
+        "deviceUnlockedAlert": "تم إلغاء قفل هذا الجهاز بنجاح وجاهز لاستقبال طالب جديد! ✅",
         "clearBtn": "مسح جميع السجلات 🗑️",
         "clearConfirm": "هل أنت متأكد من رغبتك في مسح كافة نتائج الطلاب؟ لا يمكن التراجع عن هذا الإجراء.",
         "tableColStudent": "اسم الطالب",
@@ -95,7 +103,13 @@
         "namePlaceholder": "e.g. Alex Smith",
         "gradeLabel": "🏫 Grade / Class",
         "gradeValue": "Senior 7",
-        "startBtn": "Start Quiz Adventure 🚀"
+        "startBtn": "Start Quiz Adventure 🚀",
+        "errorStudentCompleted": "⚠️ This student has already completed the exam on this system and cannot retake it.",
+        "errorDeviceLocked": "🔒 This device is locked following the previous exam. Please consult the teacher/admin to unlock for the next student.",
+        "unlockPromptTitle": "Unlock Device for Next Student 🔑",
+        "unlockPasswordPlaceholder": "Teacher / Admin Password...",
+        "unlockBtn": "Unlock & Start 🚀",
+        "unlockError": "Incorrect teacher password."
       },
       "runner": {
         "quizCounter": "Quiz {current} of {total}",
@@ -122,6 +136,8 @@
         "statTotalQuizzes": "Active Quizzes",
         "searchPlaceholder": "🔍 Search by student name or grade...",
         "exportBtn": "Download Unified TXT Report 📥",
+        "resetDeviceBtn": "Reset Device / Allow Next Student 🔓",
+        "deviceUnlockedAlert": "This device has been unlocked and is ready for the next student! ✅",
         "clearBtn": "Clear All Records 🗑️",
         "clearConfirm": "Are you sure you want to delete all student records? This action cannot be undone.",
         "tableColStudent": "Student Name",

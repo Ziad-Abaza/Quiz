@@ -49,13 +49,8 @@
       alert("Notice: No quizzes registered in quizzes/manifest.js.");
     }
 
-    // Check if there is an active incomplete session
-    const existingSession = storage.getCurrentSession();
-    if (existingSession && !existingSession.completedAt) {
-      resumeSession(existingSession);
-    } else {
-      showScreen(registrationScreen);
-    }
+    // Check if device is locked or there is an active session
+    checkDeviceAndSessionState();
 
     // Language switcher toggle
     const langBtn = document.getElementById("langSwitchBtn");
@@ -68,6 +63,7 @@
     if (window.I18n) {
       window.I18n.onLanguageChange((newLang) => {
         updateDynamicTexts();
+        checkDeviceAndSessionState();
         // Broadcast language change to currently loaded iframe
         if (quizFrame && quizFrame.contentWindow) {
           quizFrame.contentWindow.postMessage({
@@ -82,8 +78,89 @@
     registrationForm.addEventListener("submit", handleRegistration);
     nextStudentBtn.addEventListener("click", handleStartOver);
 
+    // Teacher unlock modal setup
+    setupTeacherUnlockModal();
+
     // Listen for QuizSDK postMessage events
     window.addEventListener("message", handleQuizMessage);
+  }
+
+  function checkDeviceAndSessionState() {
+    const existingSession = storage.getCurrentSession();
+    const isLocked = storage.isDeviceLocked();
+    const regAlertBox = document.getElementById("regAlertBox");
+    const deviceLockedActions = document.getElementById("deviceLockedActions");
+    const startExamBtn = document.getElementById("startExamBtn");
+
+    if (isLocked) {
+      // If student completed on this device, show completion or lock prompt
+      if (existingSession && existingSession.completedAt) {
+        showCompletionScreenUI(existingSession);
+        return;
+      }
+
+      // Show locked registration screen with unlock action
+      showScreen(registrationScreen);
+      if (regAlertBox) {
+        regAlertBox.style.display = "block";
+        regAlertBox.textContent = window.I18n ? window.I18n.t("registration.errorDeviceLocked") : "Device Locked for next student.";
+      }
+      if (deviceLockedActions) deviceLockedActions.style.display = "block";
+      if (startExamBtn) startExamBtn.disabled = true;
+      return;
+    }
+
+    // Device is NOT locked
+    if (deviceLockedActions) deviceLockedActions.style.display = "none";
+    if (startExamBtn) startExamBtn.disabled = false;
+    if (regAlertBox) regAlertBox.style.display = "none";
+
+    if (existingSession && !existingSession.completedAt) {
+      resumeSession(existingSession);
+    } else {
+      showScreen(registrationScreen);
+    }
+  }
+
+  function setupTeacherUnlockModal() {
+    const openBtn = document.getElementById("openTeacherUnlockBtn");
+    const modal = document.getElementById("unlockDeviceModal");
+    const closeBtn = document.getElementById("closeUnlockModalBtn");
+    const form = document.getElementById("unlockDeviceForm");
+    const passwordInput = document.getElementById("unlockAdminPassword");
+    const errorMsg = document.getElementById("unlockErrorMsg");
+
+    if (openBtn && modal) {
+      openBtn.addEventListener("click", () => {
+        modal.style.display = "flex";
+        if (passwordInput) {
+          passwordInput.value = "";
+          passwordInput.focus();
+        }
+        if (errorMsg) errorMsg.style.display = "none";
+      });
+    }
+
+    if (closeBtn && modal) {
+      closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+    }
+
+    if (form && modal) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const pwd = passwordInput.value;
+        const success = storage.unlockDeviceWithPassword(pwd);
+        if (success) {
+          modal.style.display = "none";
+          registrationForm.reset();
+          checkDeviceAndSessionState();
+        } else {
+          if (errorMsg) errorMsg.style.display = "block";
+        }
+      });
+    }
   }
 
   function updateDynamicTexts() {
@@ -108,11 +185,30 @@
     e.preventDefault();
     const name = studentNameInput.value.trim();
     const grade = studentGradeSelect.value;
+    const regAlertBox = document.getElementById("regAlertBox");
 
     if (!name || !grade) return;
 
-    const session = storage.startSession(name, grade);
-    startQuizFlow(session);
+    try {
+      const session = storage.startSession(name, grade);
+      if (regAlertBox) regAlertBox.style.display = "none";
+      startQuizFlow(session);
+    } catch (err) {
+      if (regAlertBox) {
+        regAlertBox.style.display = "block";
+        if (err.message === "STUDENT_ALREADY_COMPLETED") {
+          regAlertBox.textContent = window.I18n ? 
+            window.I18n.t("registration.errorStudentCompleted") : 
+            "Student has already completed the exam.";
+        } else if (err.message === "DEVICE_LOCKED") {
+          regAlertBox.textContent = window.I18n ? 
+            window.I18n.t("registration.errorDeviceLocked") : 
+            "Device is locked.";
+          const deviceLockedActions = document.getElementById("deviceLockedActions");
+          if (deviceLockedActions) deviceLockedActions.style.display = "block";
+        }
+      }
+    }
   }
 
   function resumeSession(session) {
@@ -169,12 +265,15 @@
   function handleQuizMessage(event) {
     if (!event.data || event.data.type !== "QUIZ_SUBMIT_SCORE") return;
 
+    const currentSession = storage.getCurrentSession();
+    if (!currentSession || currentSession.completedAt) return; // Session locked
+
     const { score, maxScore } = event.data;
     const currentQuiz = manifest[currentQuizIndex];
 
     if (!currentQuiz) return;
 
-    // Save score in local storage
+    // Validate and save score in local storage
     storage.saveQuizScore(currentQuiz.id, score, maxScore);
 
     // Advance to next quiz or complete
@@ -193,20 +292,23 @@
   function finishQuizFlow() {
     const completedSession = storage.completeSession();
     if (!completedSession) return;
+    showCompletionScreenUI(completedSession);
+  }
 
+  function showCompletionScreenUI(session) {
     // Update Completion Screen UI
     const congratsMsg = window.I18n ? 
       window.I18n.t("completion.congratsSubtitle") : 
       "You finished all quizzes!";
     document.getElementById("completionStudentName").textContent = 
-      completedSession.name + " - " + congratsMsg;
-    finalScoreDisplay.textContent = completedSession.totalScore + " / " + completedSession.totalMaxScore;
-    finalPercentageDisplay.textContent = completedSession.percentage + "%";
+      session.name + " - " + congratsMsg;
+    finalScoreDisplay.textContent = session.totalScore + " / " + session.totalMaxScore;
+    finalPercentageDisplay.textContent = session.percentage + "%";
 
     // Render Quiz Breakdown
     finalBreakdownList.innerHTML = "";
     manifest.forEach(quiz => {
-      const scoreObj = completedSession.scores[quiz.id];
+      const scoreObj = session.scores ? session.scores[quiz.id] : null;
       const item = document.createElement("div");
       item.className = "breakdown-item";
       if (scoreObj) {
@@ -223,6 +325,13 @@
   }
 
   function handleStartOver() {
+    // Starting a new student requires Teacher/Admin unlock if device is locked
+    if (storage.isDeviceLocked()) {
+      const modal = document.getElementById("unlockDeviceModal");
+      if (modal) modal.style.display = "flex";
+      return;
+    }
+
     storage.clearCurrentSession();
     registrationForm.reset();
     currentQuizIndex = 0;
