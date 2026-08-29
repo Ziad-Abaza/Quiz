@@ -253,15 +253,23 @@ function recordStudentSubmission(sheet, payload) {
   var mcqScore = (scores["quiz-arduino-basics-mcq"] && Number(scores["quiz-arduino-basics-mcq"].score)) || 0;
   var sensorsScore = (scores["quiz-arduino-sensors-mcq"] && Number(scores["quiz-arduino-sensors-mcq"].score)) || 0;
 
-  // Dynamically compute total earned score and total available max score across ALL quizzes submitted
-  var computedTotalScore = 0;
-  var computedTotalMaxScore = 0;
+  // Compute total earned score and total available max score across ALL quizzes submitted
+  var totalScore = 0;
+  var totalMaxScore = 0;
   if (typeof scores === "object" && Object.keys(scores).length > 0) {
     Object.keys(scores).forEach(function(key) {
-      computedTotalScore += Number(scores[key].score) || 0;
-      computedTotalMaxScore += Number(scores[key].maxScore) || 0;
+      totalScore += Number(scores[key].score) || 0;
+      totalMaxScore += Number(scores[key].maxScore) || 0;
     });
   }
+
+  // Fallback to payload totals if scores object was empty
+  if (totalMaxScore === 0) {
+    totalScore = Number(payload.totalScore) || (hwScore + mcqScore + sensorsScore);
+    totalMaxScore = Number(payload.totalMaxScore) || 34;
+  }
+
+  var percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
 
   // Flatten all answers from all completed quizzes into a clean list of { quizId, questionId, studentAnswer }
   var answersList = [];

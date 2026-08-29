@@ -10,11 +10,13 @@
       allResults: "quiz_all_results",
       adminPassword: "quiz_admin_password",
       deviceLocked: "quiz_device_locked_state",
-      completedStudents: "quiz_completed_students_registry"
+      completedStudents: "quiz_completed_students_registry",
+      pendingSyncQueue: "quiz_pending_sheets_queue",
+      localResetVersion: "quiz_local_reset_version"
     }
   };
 
-  const keys = config.storageKeys;
+  const keys = (window.APP_CONFIG && window.APP_CONFIG.storageKeys) || config.storageKeys;
 
   const StorageManager = {
     // --- Device Lock & Completed Registry ---
