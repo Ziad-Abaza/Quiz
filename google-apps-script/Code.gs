@@ -29,7 +29,8 @@ var HEADERS = [
   "Total Max Score",
   "Percentage (%)",
   "Completed At",
-  "Timestamp"
+  "Timestamp",
+  "Answers Details (JSON)"
 ];
 
 function doGet(e) {
@@ -170,6 +171,8 @@ function recordStudentSubmission(sheet, payload) {
   var totalMaxScore = Number(payload.totalMaxScore !== undefined ? payload.totalMaxScore : (computedTotalMaxScore > 0 ? computedTotalMaxScore : 34));
   var percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
 
+  var answersJson = JSON.stringify(scores);
+
   var newRow = [
     sessionId,
     studentId,
@@ -183,7 +186,8 @@ function recordStudentSubmission(sheet, payload) {
     totalMaxScore,
     percentage + "%",
     completedAt,
-    new Date().toLocaleString("en-US", { timeZone: "Africa/Cairo" })
+    new Date().toLocaleString("en-US", { timeZone: "Africa/Cairo" }),
+    answersJson
   ];
 
   sheet.appendRow(newRow);
@@ -232,17 +236,31 @@ function fetchAllRecords(sheet) {
     var parsedPct = parseInt(rawPctStr, 10);
     var finalPct = !isNaN(parsedPct) && parsedPct > 0 ? parsedPct : (rowMax > 0 ? Math.round((rowTotal / rowMax) * 100) : 0);
 
+    // Parse detailed answers JSON if present in column 14
+    var parsedScores = {
+      "quiz-arduino-hardware": { score: Number(row[5]) || 0, maxScore: 9 },
+      "quiz-arduino-basics-mcq": { score: Number(row[6]) || 0, maxScore: 15 },
+      "quiz-arduino-sensors-mcq": { score: Number(row[7]) || 0, maxScore: 10 }
+    };
+
+    if (row[13]) {
+      try {
+        var rawParsed = JSON.parse(row[13]);
+        if (rawParsed && typeof rawParsed === "object") {
+          parsedScores = rawParsed;
+        }
+      } catch (err) {
+        // Use default fallback
+      }
+    }
+
     results.push({
       id: row[0],
       studentId: row[1],
       name: row[2],
       grade: row[3],
       supervisor: row[4],
-      scores: {
-        "quiz-arduino-hardware": { score: Number(row[5]) || 0, maxScore: 9 },
-        "quiz-arduino-basics-mcq": { score: Number(row[6]) || 0, maxScore: 15 },
-        "quiz-arduino-sensors-mcq": { score: Number(row[7]) || 0, maxScore: 10 }
-      },
+      scores: parsedScores,
       totalScore: rowTotal,
       totalMaxScore: rowMax > 0 ? rowMax : 34,
       percentage: finalPct,

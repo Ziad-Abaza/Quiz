@@ -443,11 +443,43 @@
       feedbackMsg.innerHTML = `<span style="color: #EA580C; font-weight: 800; font-size: 1.1rem;">${msg}</span>`;
     }
 
-    // Submit score exactly once to QuizSDK
+    // Build detailed answer snapshot for audit/review
+    const answerDetails = components.map(comp => {
+      const input = document.getElementById(`input-${comp.id}`);
+      const rawVal = input ? input.value : "";
+      const val = normalizeArabic(rawVal);
+      const isArabicCorrect = matchAnswer(val, comp.arabicAnswers);
+      const isEnglishCorrect = matchAnswer(val, comp.englishAnswers);
+      const isCorrect = val.length > 0 && (isArabicCorrect || isEnglishCorrect);
+
+      return {
+        questionId: comp.id,
+        questionText: {
+          ar: `المكون رقم ${comp.id} في لوحة الأردوينو`,
+          en: `Component #${comp.id} on Arduino Uno`
+        },
+        studentAnswer: rawVal.trim() || "(بدون إجابة / No answer)",
+        correctAnswer: {
+          ar: comp.arabicAnswers[0],
+          en: comp.englishAnswers[0]
+        },
+        isCorrect: isCorrect
+      };
+    });
+
+    // Submit score and detailed answer snapshot to QuizSDK
     if (window.QuizSDK) {
       window.QuizSDK.submitScore({
         score: score,
-        maxScore: total
+        maxScore: total,
+        metadata: {
+          quizId: "quiz-arduino-hardware",
+          quizTitle: {
+            ar: "مكونات لوحة أردوينو (Arduino Uno)",
+            en: "Arduino Uno Hardware Components"
+          },
+          answers: answerDetails
+        }
       });
     }
   }

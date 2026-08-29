@@ -121,7 +121,7 @@
       }
     },
 
-    saveQuizScore(quizId, score, maxScore) {
+    saveQuizScore(quizId, score, maxScore, metadata) {
       const session = this.getCurrentSession();
       if (!session) return null;
       if (session.completedAt) return session; // Locked session
@@ -129,12 +129,15 @@
       // Validate inputs
       const safeScore = Math.max(0, Math.min(Number(score) || 0, Number(maxScore) || 100));
       const safeMaxScore = Math.max(1, Number(maxScore) || 1);
+      const safeMetadata = metadata && typeof metadata === "object" ? metadata : {};
 
       // Prevent duplicate submission overwriting if already completed
       if (!session.scores[quizId]) {
         session.scores[quizId] = {
           score: safeScore,
           maxScore: safeMaxScore,
+          answers: safeMetadata.answers || [],
+          quizTitle: safeMetadata.quizTitle || null,
           completedAt: new Date().toISOString()
         };
         localStorage.setItem(keys.currentSession, JSON.stringify(session));

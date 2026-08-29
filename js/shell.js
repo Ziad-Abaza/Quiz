@@ -292,13 +292,13 @@
     const currentSession = storage.getCurrentSession();
     if (!currentSession || currentSession.completedAt) return; // Session locked
 
-    const { score, maxScore } = event.data;
+    const { score, maxScore, metadata } = event.data;
     const currentQuiz = manifest[currentQuizIndex];
 
     if (!currentQuiz) return;
 
-    // Validate and save score in local storage
-    storage.saveQuizScore(currentQuiz.id, score, maxScore);
+    // Validate and save score and detailed answer snapshot in storage
+    storage.saveQuizScore(currentQuiz.id, score, maxScore, metadata);
 
     // Advance to next quiz or complete
     currentQuizIndex++;

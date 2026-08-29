@@ -356,19 +356,52 @@
 
     // Calculate score exactly matching [2, 2, 2, 3, 1, 3, 1, 2, 2, 2]
     let score = 0;
+    const answerDetails = [];
+
     questionsData.forEach((q, idx) => {
       const expected = correctAnswers[idx];
       const selected = userAnswers[q.id];
-      if (selected === expected) {
-        score++;
-      }
+      const isCorrect = selected === expected;
+      if (isCorrect) score++;
+
+      const selectedOptAr = selected ? q.ar.options[selected - 1] : "(بدون إجابة)";
+      const selectedOptEn = selected ? q.en.options[selected - 1] : "(No answer)";
+      const correctOptAr = q.ar.options[expected - 1];
+      const correctOptEn = q.en.options[expected - 1];
+
+      answerDetails.push({
+        questionId: q.id,
+        questionText: {
+          ar: q.ar.q,
+          en: q.en.q
+        },
+        studentAnswer: {
+          ar: selectedOptAr,
+          en: selectedOptEn,
+          optionIndex: selected || null
+        },
+        correctAnswer: {
+          ar: correctOptAr,
+          en: correctOptEn,
+          optionIndex: expected
+        },
+        isCorrect: isCorrect
+      });
     });
 
-    // Submit via standard QuizSDK
+    // Submit via standard QuizSDK with complete metadata snapshot
     if (window.QuizSDK) {
       window.QuizSDK.submitScore({
         score: score,
-        maxScore: 10
+        maxScore: 10,
+        metadata: {
+          quizId: "quiz-arduino-sensors-mcq",
+          quizTitle: {
+            ar: "اختبار حساسات ومكونات الأردوينو",
+            en: "Arduino Sensors Quiz"
+          },
+          answers: answerDetails
+        }
       });
     }
   }

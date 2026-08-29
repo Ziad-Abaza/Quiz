@@ -160,7 +160,7 @@
     if (results.length === 0) {
       const emptyTitle = window.I18n ? window.I18n.t("admin.emptyTitle") : "No student quiz records found.";
       const emptySubtitle = window.I18n ? window.I18n.t("admin.emptySubtitle") : "";
-      resultsTableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📋</div><strong>' + emptyTitle + '</strong><p style="margin-top: 4px; font-size: 0.85rem;">' + emptySubtitle + '</p></td></tr>';
+      resultsTableBody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="empty-state-icon">📋</div><strong>' + emptyTitle + '</strong><p style="margin-top: 4px; font-size: 0.85rem;">' + emptySubtitle + '</p></td></tr>';
       return;
     }
 
@@ -169,15 +169,147 @@
       const completedTime = student.completedAt ? new Date(student.completedAt).toLocaleString() : (student.timestamp || "N/A");
       const pctValue = Number(student.percentage) || 0;
       const pctBadge = pctValue >= 80 ? "badge-success" : "badge-primary";
+      const btnText = window.I18n ? window.I18n.t("admin.reviewAnswersBtn") : "Review Answers 🔍";
 
       tr.innerHTML = '<td><strong>' + (idx + 1) + '</strong></td>' +
         '<td><strong>' + escapeHtml(student.name) + '</strong></td>' +
         '<td><span class="badge badge-primary">' + escapeHtml(student.grade) + '</span></td>' +
         '<td>' + student.totalScore + ' / ' + student.totalMaxScore + ' pts</td>' +
         '<td><span class="badge ' + pctBadge + '">' + pctValue + '%</span></td>' +
-        '<td style="color: var(--text-muted); font-size: 0.85rem;">' + completedTime + '</td>';
+        '<td style="color: var(--text-muted); font-size: 0.85rem;">' + completedTime + '</td>' +
+        '<td><button type="button" class="btn-review-answers" data-index="' + idx + '">' + btnText + '</button></td>';
+
+      const reviewBtn = tr.querySelector(".btn-review-answers");
+      if (reviewBtn) {
+        reviewBtn.addEventListener("click", function() {
+          openReviewModal(student);
+        });
+      }
+
       resultsTableBody.appendChild(tr);
     });
+  }
+
+  function openReviewModal(student) {
+    const modal = document.getElementById("reviewAnswersModal");
+    const closeBtn = document.getElementById("closeReviewModalBtn");
+    const nameEl = document.getElementById("reviewStudentName");
+    const metaEl = document.getElementById("reviewStudentMeta");
+    const bannerEl = document.getElementById("reviewScoreBanner");
+    const container = document.getElementById("reviewQuizzesContainer");
+
+    if (!modal) return;
+
+    const lang = (window.I18n && window.I18n.getLang()) || "ar";
+
+    // Set Student Details Header
+    nameEl.textContent = student.name;
+    metaEl.textContent = student.grade + " • " + (student.completedAt ? new Date(student.completedAt).toLocaleString() : (student.timestamp || ""));
+
+    // Overall Score Banner
+    const scoreLabel = lang === "ar" ? "الدرجة الإجمالية للطالب:" : "Overall Student Score:";
+    bannerEl.innerHTML = `
+      <span>${scoreLabel}</span>
+      <span style="color: var(--brand-accent); font-size: 1.2rem;">${student.totalScore} / ${student.totalMaxScore} pts (${student.percentage}%)</span>
+    `;
+
+    // Render Quizzes Breakdown & Answers
+    container.innerHTML = "";
+
+    const scoresObj = student.scores || {};
+    const quizKeys = Object.keys(scoresObj);
+
+    if (quizKeys.length === 0) {
+      container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">${lang === "ar" ? "لا توجد تفاصيل إجابات مسجلة لهذا الطالب." : "No detailed answer records available for this student."}</div>`;
+    } else {
+      quizKeys.forEach(quizId => {
+        const quizData = scoresObj[quizId] || {};
+        const quizMeta = manifest.find(m => m.id === quizId);
+        
+        let quizTitle = quizId;
+        if (quizData.quizTitle) {
+          quizTitle = typeof quizData.quizTitle === "object" ? (quizData.quizTitle[lang] || quizData.quizTitle.ar || quizData.quizTitle.en) : quizData.quizTitle;
+        } else if (quizMeta) {
+          quizTitle = quizMeta.title;
+        }
+
+        const quizSection = document.createElement("div");
+        quizSection.className = "review-quiz-section";
+
+        quizSection.innerHTML = `
+          <div class="review-quiz-header">
+            <span class="review-quiz-title">${escapeHtml(quizTitle)}</span>
+            <span class="review-quiz-score-badge">${quizData.score || 0} / ${quizData.maxScore || 0} pts</span>
+          </div>
+          <div class="review-questions-list"></div>
+        `;
+
+        const qListEl = quizSection.querySelector(".review-questions-list");
+        const answers = quizData.answers || [];
+
+        if (answers.length === 0) {
+          qListEl.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem;">${lang === "ar" ? "تم تسجيل الدرجة الكلية فقط لهذا الاختبار." : "Only total score recorded for this quiz."}</div>`;
+        } else {
+          answers.forEach((ans, qIdx) => {
+            const isCorrect = Boolean(ans.isCorrect);
+            const qCard = document.createElement("div");
+            qCard.className = `review-question-card ${isCorrect ? "is-correct" : "is-wrong"}`;
+
+            let qPrompt = typeof ans.questionText === "object" ? 
+              (ans.questionText[lang] || ans.questionText.ar || ans.questionText.en || `السؤال #${qIdx + 1}`) : 
+              (ans.questionText || `Question #${qIdx + 1}`);
+
+            let studentAnsText = typeof ans.studentAnswer === "object" ?
+              (ans.studentAnswer[lang] || ans.studentAnswer.ar || ans.studentAnswer.en || "") :
+              (ans.studentAnswer || "");
+
+            let correctAnsText = typeof ans.correctAnswer === "object" ?
+              (ans.correctAnswer[lang] || ans.correctAnswer.ar || ans.correctAnswer.en || "") :
+              (ans.correctAnswer || "");
+
+            const statusText = isCorrect ? 
+              (lang === "ar" ? "إجابة صحيحة ✅" : "Correct ✅") : 
+              (lang === "ar" ? "إجابة خاطئة ❌" : "Incorrect ❌");
+            const statusColor = isCorrect ? "#16A34A" : "#E11D48";
+
+            qCard.innerHTML = `
+              <div class="review-question-prompt">
+                <span>${escapeHtml(qPrompt)}</span>
+              </div>
+              <div class="review-answer-row">
+                <div>
+                  <span class="review-ans-label">${lang === "ar" ? "إجابة الطالب:" : "Student's Answer:"} </span>
+                  <span class="review-ans-val" style="color: ${statusColor};">${escapeHtml(studentAnsText)}</span>
+                </div>
+                <div style="font-weight: 800; color: ${statusColor}; font-size: 0.85rem;">
+                  ${statusText}
+                </div>
+              </div>
+              <div class="review-answer-row" style="margin-top: 4px;">
+                <div>
+                  <span class="review-ans-label">${lang === "ar" ? "الإجابة النموذجية الصحيحة:" : "Correct Answer:"} </span>
+                  <span class="review-ans-val" style="color: #16A34A;">${escapeHtml(correctAnsText)}</span>
+                </div>
+              </div>
+            `;
+
+            qListEl.appendChild(qCard);
+          });
+        }
+
+        container.appendChild(quizSection);
+      });
+    }
+
+    modal.style.display = "flex";
+
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    };
+
+    modal.onclick = function(e) {
+      if (e.target === modal) modal.style.display = "none";
+    };
   }
 
   function handleSearch(e) {

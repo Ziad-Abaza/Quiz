@@ -122,12 +122,37 @@
               <th data-i18n="admin.tableColScore">Score</th>
               <th data-i18n="admin.tableColPercentage">Performance</th>
               <th data-i18n="admin.tableColDate">Completed Time</th>
+              <th data-i18n="admin.tableColActions">Actions</th>
             </tr>
           </thead>
           <tbody id="resultsTableBody">
             <!-- Dynamic rows -->
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT & REVIEW ANSWERS MODAL -->
+  <div id="reviewAnswersModal" class="modal-overlay" style="display: none;">
+    <div class="card modal-card review-modal-card animate-pop">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid var(--border-standard); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.8rem;">📋</span>
+          <div>
+            <h2 id="reviewStudentName" style="color: var(--brand-primary); font-size: 1.3rem; font-weight: 800; margin: 0;"></h2>
+            <span id="reviewStudentMeta" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;"></span>
+          </div>
+        </div>
+        <button type="button" id="closeReviewModalBtn" class="modal-close-btn" title="Close">✕</button>
+      </div>
+
+      <!-- Total Score Header -->
+      <div id="reviewScoreBanner" class="review-score-banner"></div>
+
+      <!-- Quiz Answers Container -->
+      <div id="reviewQuizzesContainer" class="review-quizzes-scroll-container">
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>

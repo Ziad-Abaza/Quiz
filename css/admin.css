@@ -245,6 +245,155 @@
   border-bottom: 1px solid var(--border-standard);
 }
 
+.data-table tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* ==========================================================================
+   Review Answers Modal & Audit Cards
+   ========================================================================== */
+
+.review-modal-card {
+  max-width: 780px;
+  width: 95%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.review-score-banner {
+  background: #F1F5F9;
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.review-quizzes-scroll-container {
+  overflow-y: auto;
+  padding-right: 6px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-quiz-section {
+  background: #FFFFFF;
+  border: 2px solid var(--border-standard);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+
+.review-quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed var(--border-standard);
+}
+
+.review-quiz-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--brand-primary);
+}
+
+.review-quiz-score-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 800;
+  background: var(--module-02-bg);
+  color: var(--module-02-accent);
+  border: 1px solid var(--module-02-border);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.review-question-card {
+  background: #F8FAFC;
+  border: 1.5px solid var(--border-standard);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.review-question-card.is-correct {
+  border-left: 5px solid #16A34A;
+  background: rgba(22, 163, 74, 0.03);
+}
+
+[dir="rtl"] .review-question-card.is-correct {
+  border-left: 1.5px solid var(--border-standard);
+  border-right: 5px solid #16A34A;
+}
+
+.review-question-card.is-wrong {
+  border-left: 5px solid #E11D48;
+  background: rgba(225, 29, 72, 0.03);
+}
+
+[dir="rtl"] .review-question-card.is-wrong {
+  border-left: 1.5px solid var(--border-standard);
+  border-right: 5px solid #E11D48;
+}
+
+.review-question-prompt {
+  font-weight: 800;
+  color: #1E293B;
+  font-size: 0.98rem;
+  margin-bottom: 8px;
+}
+
+.review-answer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.review-ans-label {
+  font-weight: 700;
+  color: #64748B;
+}
+
+.review-ans-val {
+  font-weight: 800;
+}
+
+.btn-review-answers {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--brand-accent);
+  background: rgba(12, 166, 163, 0.1);
+  color: var(--brand-accent);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-review-answers:hover {
+  background: var(--brand-accent);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(12, 166, 163, 0.25);
+}
+
 .data-table th {
   background: var(--canvas-bg);
   font-weight: 800;
